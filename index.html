@@ -152,8 +152,8 @@
             border-radius: 50%;
             margin: 25px auto;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            opacity: 0;
-            animation: spinRotate 1s linear infinite, fadeIn 0.8s ease-out 0.8s forwards;
+            animation: spinRotate 1s linear infinite;
+            opacity: 1;
         }
 
         .progress-wrapper {
@@ -210,7 +210,7 @@
             background-size: 200% 100%;
             border-radius: 10px;
             width: 0%;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.3s ease-out;
             box-shadow: 
                 0 0 20px rgba(255, 255, 255, 0.5),
                 0 0 40px rgba(255, 255, 255, 0.3),
@@ -436,192 +436,168 @@
     </div>
 
     <script>
-        // Система управления загрузкой с минимальным временем отображения
-        const LoadingManager = {
-            startTime: Date.now(),
-            minLoadTime: 3000, // Минимальное время загрузки в миллисекундах
-            actualProgress: 0,
-            displayProgress: 0,
-            targetProgress: 0,
-            isCompleted: false,
-            loadStarted: false,
-            progressQueue: [],
+        // Глобальные переменные
+        let currentProgress = 0;
+        let targetProgress = 0;
+        let isGmodLoading = false;
+        let startTime = Date.now();
+        let filesDownloaded = 0;
+        let filesTotal = 0;
 
-            init: function() {
-                this.startTime = Date.now();
-                this.createParticles();
-                this.startProgressAnimation();
-            },
-
-            createParticles: function() {
-                const container = document.getElementById('particles');
-                const count = 25;
-                
-                for (let i = 0; i < count; i++) {
-                    setTimeout(() => {
-                        const particle = document.createElement('div');
-                        particle.className = 'particle';
-                        
-                        const size = Math.random() * 4 + 2;
-                        particle.style.width = size + 'px';
-                        particle.style.height = size + 'px';
-                        
-                        const startX = Math.random() * 100;
-                        particle.style.left = startX + '%';
-                        particle.style.top = '100vh';
-                        
-                        const translateX = (Math.random() - 0.5) * 200;
-                        particle.style.setProperty('--tx', translateX + 'px');
-                        
-                        const duration = Math.random() * 12 + 15;
-                        const delay = Math.random() * 5;
-                        
-                        particle.style.animation = `particleDrift ${duration}s linear ${delay}s infinite`;
-                        
-                        container.appendChild(particle);
-                    }, i * 100);
-                }
-            },
-
-            startProgressAnimation: function() {
-                setInterval(() => {
-                    if (!this.isCompleted) {
-                        const elapsed = Date.now() - this.startTime;
-                        
-                        // Плавное увеличение прогресса к целевому значению
-                        if (this.displayProgress < this.targetProgress) {
-                            const diff = this.targetProgress - this.displayProgress;
-                            this.displayProgress += Math.min(diff * 0.1, 2);
-                        }
-
-                        // Если минимальное время не прошло, ограничиваем прогресс
-                        if (elapsed < this.minLoadTime && this.displayProgress > 85) {
-                            this.displayProgress = Math.min(this.displayProgress, 85);
-                        }
-
-                        // Если минимальное время прошло и есть полная загрузка
-                        if (elapsed >= this.minLoadTime && this.targetProgress >= 100) {
-                            this.displayProgress = Math.min(this.displayProgress + 2, 100);
-                            
-                            if (this.displayProgress >= 100) {
-                                this.completeLoading();
-                            }
-                        }
-
-                        this.updateProgressDisplay(this.displayProgress);
-                    }
-                }, 50);
-            },
-
-            setProgress: function(progress) {
-                this.loadStarted = true;
-                this.actualProgress = progress;
-                this.targetProgress = Math.max(this.targetProgress, progress);
-
-                // Автоматически завершаем, если достигли 100%
-                if (progress >= 100) {
-                    const elapsed = Date.now() - this.startTime;
-                    if (elapsed >= this.minLoadTime) {
-                        this.targetProgress = 100;
-                    }
-                }
-            },
-
-            updateProgressDisplay: function(progress) {
-                const bar = document.getElementById('progressBar');
-                const percent = document.getElementById('percentLabel');
-                
-                if (bar && percent) {
-                    bar.style.width = progress + '%';
-                    percent.textContent = Math.floor(progress) + '%';
+        // Создание частиц
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const count = 25;
+            
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
                     
-                    if (progress >= 100) {
-                        percent.style.color = 'rgba(255, 255, 255, 1)';
-                    } else {
-                        percent.style.color = 'rgba(255, 255, 255, 0.95)';
-                    }
-                }
-            },
-
-            completeLoading: function() {
-                if (!this.isCompleted) {
-                    this.isCompleted = true;
-                    setTimeout(() => {
-                        const container = document.querySelector('.main-container');
-                        if (container) {
-                            container.style.transition = 'opacity 1s ease-out';
-                            container.style.opacity = '0';
-                        }
-                    }, 500);
-                }
-            },
-
-            setStatus: function(status) {
-                const statusEl = document.getElementById('statusText');
-                const labelEl = document.getElementById('statusLabel');
-                
-                if (statusEl && labelEl) {
-                    statusEl.style.opacity = '0';
-                    labelEl.style.opacity = '0';
+                    const size = Math.random() * 4 + 2;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
                     
-                    setTimeout(() => {
-                        statusEl.textContent = status;
-                        labelEl.textContent = status;
-                        statusEl.style.transition = 'opacity 0.4s ease';
-                        labelEl.style.transition = 'opacity 0.4s ease';
-                        statusEl.style.opacity = '0.8';
-                        labelEl.style.opacity = '0.9';
-                    }, 200);
-                }
+                    const startX = Math.random() * 100;
+                    particle.style.left = startX + '%';
+                    particle.style.top = '100vh';
+                    
+                    const translateX = (Math.random() - 0.5) * 200;
+                    particle.style.setProperty('--tx', translateX + 'px');
+                    
+                    const duration = Math.random() * 12 + 15;
+                    const delay = Math.random() * 5;
+                    
+                    particle.style.animation = `particleDrift ${duration}s linear ${delay}s infinite`;
+                    
+                    container.appendChild(particle);
+                }, i * 100);
             }
-        };
+        }
 
-        // Инициализация системы загрузки
-        LoadingManager.init();
+        // Обновление прогресс бара
+        function updateProgress(progress) {
+            const bar = document.getElementById('progressBar');
+            const percent = document.getElementById('percentLabel');
+            
+            if (bar) {
+                bar.style.width = progress + '%';
+            }
+            if (percent) {
+                percent.textContent = Math.floor(progress) + '%';
+            }
+        }
 
-        // API функции для GMod
+        // Плавное изменение прогресса
+        function animateProgress() {
+            if (currentProgress < targetProgress) {
+                currentProgress += 0.5;
+                if (currentProgress > targetProgress) {
+                    currentProgress = targetProgress;
+                }
+                updateProgress(currentProgress);
+            }
+
+            if (currentProgress >= 100) {
+                setTimeout(() => {
+                    const container = document.querySelector('.main-container');
+                    if (container) {
+                        container.style.transition = 'opacity 1s ease-out';
+                        container.style.opacity = '0';
+                        setTimeout(() => {
+                            document.body.style.display = 'none';
+                        }, 1000);
+                    }
+                }, 500);
+            }
+        }
+
+        // Автоматическое увеличение прогресса (если GMod не отправляет данные)
+        function autoProgress() {
+            if (!isGmodLoading && targetProgress < 30) {
+                targetProgress += Math.random() * 0.3;
+                if (targetProgress > 30) targetProgress = 30;
+            }
+        }
+
+        // Обновление статуса
+        function updateStatus(status) {
+            const statusEl = document.getElementById('statusText');
+            const labelEl = document.getElementById('statusLabel');
+            
+            if (statusEl) {
+                statusEl.textContent = status;
+            }
+            if (labelEl) {
+                labelEl.textContent = status.split(':')[0];
+            }
+        }
+
+        // Статусы для автоматической смены
+        const statusMessages = [
+            'Подключение к серверу...',
+            'Получение информации...',
+            'Синхронизация данных...',
+            'Загрузка ресурсов...',
+            'Загрузка карты...',
+            'Загрузка моделей...',
+            'Загрузка текстур...',
+            'Загрузка звуков...',
+            'Подготовка игры...',
+            'Финализация...'
+        ];
+
+        let statusIndex = 0;
+
+        // Смена статусов
+        function cycleStatus() {
+            if (currentProgress < 95) {
+                updateStatus(statusMessages[statusIndex % statusMessages.length]);
+                statusIndex++;
+            }
+        }
+
+        // ==================== GMod API Функции ====================
+
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
             const serverNameEl = document.getElementById('serverName');
             if (servername && serverNameEl) {
-                serverNameEl.style.opacity = '0';
-                setTimeout(() => {
-                    serverNameEl.textContent = servername;
-                    serverNameEl.style.transition = 'opacity 0.5s ease';
-                    serverNameEl.style.opacity = '1';
-                }, 100);
+                serverNameEl.textContent = servername;
             }
         }
 
         function SetStatusChanged(status) {
-            LoadingManager.setStatus(status);
+            isGmodLoading = true;
+            updateStatus(status);
         }
 
         function SetFilesNeeded(needed) {
+            filesTotal = needed;
             const counter = document.getElementById('fileCounter');
             if (counter) {
                 counter.innerHTML = 'Необходимо файлов: <span style="color: rgba(255,255,255,0.8)">' + needed + '</span>';
-                counter.style.opacity = '0.6';
             }
         }
 
         function SetFilesTotal(total) {
+            filesTotal = total;
             const counter = document.getElementById('fileCounter');
             if (counter) {
                 counter.innerHTML = 'Всего файлов: <span style="color: rgba(255,255,255,0.8)">' + total + '</span>';
-                counter.style.opacity = '0.6';
             }
         }
 
         function DownloadingFile(fileName) {
+            isGmodLoading = true;
             const statusEl = document.getElementById('statusText');
             if (statusEl && fileName) {
                 const shortName = fileName.length > 40 ? '...' + fileName.slice(-37) : fileName;
                 statusEl.textContent = 'Загрузка: ' + shortName;
-                statusEl.style.opacity = '0.8';
             }
         }
 
         function SetFilesDownloaded(downloaded) {
+            filesDownloaded = downloaded;
             const fileCount = document.getElementById('fileCount');
             if (fileCount) {
                 fileCount.textContent = downloaded;
@@ -629,55 +605,49 @@
         }
 
         function SetLoadProgress(progress) {
-            LoadingManager.setProgress(parseFloat(progress) || 0);
+            isGmodLoading = true;
+            targetProgress = parseFloat(progress) || 0;
+            if (targetProgress > 100) targetProgress = 100;
         }
 
+        // ==================== Инициализация ====================
+
+        // Запуск частиц
+        createParticles();
+
+        // Главный цикл анимации
+        setInterval(() => {
+            animateProgress();
+            autoProgress();
+        }, 50);
+
         // Автоматическая смена статусов
-        const statusMessages = [
-            'Подключение к серверу...',
-            'Получение информации о сервере...',
-            'Синхронизация с сервером...',
-            'Загрузка ресурсов...',
-            'Загрузка карты...',
-            'Загрузка моделей и текстур...',
-            'Загрузка звуков...',
-            'Загрузка материалов...',
-            'Подготовка игрового мира...',
-            'Оптимизация производительности...',
-            'Финализация загрузки...',
-            'Почти готово...'
-        ];
-
-        let msgIndex = 0;
-        const statusInterval = setInterval(() => {
-            if (!LoadingManager.isCompleted && LoadingManager.displayProgress < 100) {
-                LoadingManager.setStatus(statusMessages[msgIndex % statusMessages.length]);
-                msgIndex++;
-            } else {
-                clearInterval(statusInterval);
+        setInterval(() => {
+            if (!isGmodLoading || currentProgress < 20) {
+                cycleStatus();
             }
-        }, 3500);
-
-        // Фоновая автозагрузка (если GMod не передает данные)
-        let autoProgress = 0;
-        const autoProgressInterval = setInterval(() => {
-            if (!LoadingManager.loadStarted && autoProgress < 30) {
-                autoProgress += Math.random() * 1.5;
-                LoadingManager.setProgress(Math.min(autoProgress, 30));
-            }
-        }, 800);
+        }, 3000);
 
         // Начальный статус
         setTimeout(() => {
-            LoadingManager.setStatus('Подключение к серверу...');
-        }, 1500);
-
-        // Остановка автопрогресса при реальной загрузке
-        setInterval(() => {
-            if (LoadingManager.loadStarted && autoProgressInterval) {
-                clearInterval(autoProgressInterval);
-            }
+            updateStatus('Подключение к серверу...');
         }, 1000);
+
+        // Демо режим (автоматическая загрузка для теста)
+        // Раскомментируйте для тестирования без GMod
+        /*
+        let demoProgress = 0;
+        setInterval(() => {
+            if (demoProgress < 100) {
+                demoProgress += Math.random() * 2;
+                SetLoadProgress(demoProgress);
+                
+                if (Math.random() > 0.7) {
+                    SetFilesDownloaded(Math.floor(demoProgress * 1.5));
+                }
+            }
+        }, 200);
+        */
     </script>
 </body>
 </html>
