@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lost Underground - Загрузка</title>
     <style>
-        /* ============================================
-           БАЗОВЫЕ СТИЛИ И СБРОС
-           ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -24,9 +21,6 @@
             position: relative;
         }
 
-        /* ============================================
-           ФОНОВЫЕ СЛОИ И ИЗОБРАЖЕНИЯ
-           ============================================ */
         .background-layer {
             position: fixed;
             top: 0;
@@ -62,7 +56,6 @@
             opacity: 0.4;
         }
 
-        /* Первый слой затемнения */
         .bg-overlay-dark {
             position: absolute;
             top: 0;
@@ -78,7 +71,6 @@
             z-index: 2;
         }
 
-        /* Второй слой с градиентом */
         .bg-overlay-gradient {
             position: absolute;
             top: 0;
@@ -95,7 +87,6 @@
             animation: gradientPulse 8s ease-in-out infinite;
         }
 
-        /* Сетка для эффекта глубины */
         .grid-pattern {
             position: fixed;
             top: 0;
@@ -111,7 +102,6 @@
             pointer-events: none;
         }
 
-        /* Виньетка по краям */
         .vignette {
             position: fixed;
             top: 0;
@@ -123,35 +113,6 @@
             pointer-events: none;
         }
 
-        /* ============================================
-           СИСТЕМА ЧАСТИЦ
-           ============================================ */
-        .particles-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 6;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            background: radial-gradient(
-                circle,
-                rgba(255, 255, 255, 0.6) 0%,
-                rgba(255, 255, 255, 0.2) 50%,
-                transparent 100%
-            );
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        /* ============================================
-           ГЛАВНЫЙ КОНТЕЙНЕР
-           ============================================ */
         .main-content {
             position: relative;
             z-index: 100;
@@ -164,9 +125,6 @@
             padding: 40px;
         }
 
-        /* ============================================
-           СПИННЕР И ЛОГОТИП
-           ============================================ */
         .spinner-wrapper {
             position: relative;
             margin-bottom: 50px;
@@ -174,7 +132,6 @@
             transform: translateY(-40px);
         }
 
-        /* Внешнее свечение */
         .spinner-glow {
             position: absolute;
             top: 50%;
@@ -192,7 +149,6 @@
             z-index: 1;
         }
 
-        /* Внешний крутящийся круг */
         .spinner-outer {
             position: relative;
             width: 150px;
@@ -209,7 +165,6 @@
                 inset 0 0 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* Средний круг */
         .spinner-middle {
             position: absolute;
             top: 50%;
@@ -226,7 +181,6 @@
             z-index: 3;
         }
 
-        /* Внутренний круг с логотипом */
         .spinner-inner {
             position: absolute;
             top: 50%;
@@ -246,7 +200,6 @@
             z-index: 4;
         }
 
-        /* Логотип в центре */
         .logo-image {
             width: 90px;
             height: 90px;
@@ -256,7 +209,6 @@
             animation: logoFloat 4s ease-in-out infinite;
         }
 
-        /* Дополнительный крутящийся круг (обратное вращение) */
         .spinner-ring {
             position: absolute;
             top: 50%;
@@ -272,9 +224,6 @@
             z-index: 1;
         }
 
-        /* ============================================
-           ТЕКСТОВЫЕ БЛОКИ
-           ============================================ */
         .title-section {
             text-align: center;
             margin-bottom: 60px;
@@ -308,9 +257,6 @@
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
         }
 
-        /* ============================================
-           СТАТУСЫ ЗАГРУЗКИ
-           ============================================ */
         .status-container {
             width: 90%;
             max-width: 1000px;
@@ -345,7 +291,6 @@
             max-width: 100%;
         }
 
-        /* Градация размеров статусов (сверху вниз) */
         .status-line:nth-child(1) {
             font-size: 13px;
             opacity: 0.35;
@@ -384,33 +329,6 @@
                 0 4px 10px rgba(0, 0, 0, 0.8);
         }
 
-        /* ============================================
-           ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ
-           ============================================ */
-        .info-footer {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 40px;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 1.5px;
-            font-family: 'Courier New', monospace;
-            animation: fadeIn 2s ease-out 1.5s both;
-        }
-
-        .info-item {
-            padding: 8px 16px;
-            background: rgba(25, 25, 25, 0.6);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* ============================================
-           АНИМАЦИИ
-           ============================================ */
         @keyframes gradientPulse {
             0%, 100% {
                 opacity: 1;
@@ -502,23 +420,6 @@
             }
         }
 
-        @keyframes particleFloat {
-            0% {
-                transform: translate(var(--start-x), 100vh) scale(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.6;
-            }
-            90% {
-                opacity: 0.6;
-            }
-            100% {
-                transform: translate(var(--end-x), -100px) scale(1);
-                opacity: 0;
-            }
-        }
-
         @keyframes fadeOutAll {
             to {
                 opacity: 0;
@@ -530,9 +431,6 @@
             animation: fadeOutAll 1.2s ease-out forwards;
         }
 
-        /* ============================================
-           АДАПТИВНОСТЬ
-           ============================================ */
         @media (max-width: 768px) {
             .main-title {
                 font-size: 38px;
@@ -568,19 +466,10 @@
             .status-line:nth-child(3) { font-size: 15px; }
             .status-line:nth-child(4) { font-size: 18px; }
             .status-line:nth-child(5) { font-size: 22px; }
-
-            .info-footer {
-                flex-direction: column;
-                gap: 10px;
-                align-items: center;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- ============================================
-         ФОНОВЫЕ СЛОИ
-         ============================================ -->
     <div class="background-layer">
         <div class="bg-image-container">
             <div class="bg-image" id="bgImage1"></div>
@@ -593,16 +482,7 @@
         <div class="vignette"></div>
     </div>
 
-    <!-- ============================================
-         ЧАСТИЦЫ
-         ============================================ -->
-    <div class="particles-container" id="particlesContainer"></div>
-
-    <!-- ============================================
-         ОСНОВНОЙ КОНТЕНТ
-         ============================================ -->
     <div class="main-content">
-        <!-- Спиннер с логотипом -->
         <div class="spinner-wrapper">
             <div class="spinner-glow"></div>
             <div class="spinner-ring"></div>
@@ -618,45 +498,27 @@
             </div>
         </div>
 
-        <!-- Заголовки -->
         <div class="title-section">
             <h1 class="main-title">LOST UNDERGROUND</h1>
             <p class="subtitle">подземное выживание</p>
         </div>
 
-        <!-- Статусы загрузки -->
         <div class="status-container" id="statusContainer">
-            <div class="status-line">Подготовка...</div>
-            <div class="status-line">Подключение к серверу...</div>
-            <div class="status-line">Инициализация...</div>
-            <div class="status-line">Загрузка ресурсов...</div>
-            <div class="status-line">Ожидание...</div>
-        </div>
-
-        <!-- Футер с информацией -->
-        <div class="info-footer">
-            <div class="info-item">
-                <span id="serverInfo">Подключение...</span>
-            </div>
-            <div class="info-item">
-                <span id="fileCounter">Файлов: 0</span>
-            </div>
+            <div class="status-line">Подготовка</div>
+            <div class="status-line">Подключение к серверу</div>
+            <div class="status-line">Инициализация</div>
+            <div class="status-line">Загрузка ресурсов</div>
+            <div class="status-line">Ожидание</div>
         </div>
     </div>
 
-    <!-- ============================================
-         JAVASCRIPT ЛОГИКА
-         ============================================ -->
     <script>
-        // ============================================
-        // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
-        // ============================================
         let statusHistory = [
-            'Подготовка...',
-            'Подключение к серверу...',
-            'Инициализация...',
-            'Загрузка ресурсов...',
-            'Ожидание...'
+            'Подготовка',
+            'Подключение к серверу',
+            'Инициализация',
+            'Загрузка ресурсов',
+            'Ожидание'
         ];
 
         let currentProgress = 0;
@@ -665,7 +527,6 @@
         let isGmodActive = false;
         let backgroundIndex = 0;
 
-        // Массив фоновых изображений
         const backgroundImages = [
             'https://garry-s-mod.ru/wp-content/uploads/2022/02/24787.jpg',
             'https://garry-s-mod.ru/wp-content/uploads/2020/09/35878.jpg',
@@ -678,92 +539,39 @@
             document.getElementById('bgImage3')
         ];
 
-        // ============================================
-        // СИСТЕМА ФОНОВЫХ ИЗОБРАЖЕНИЙ
-        // ============================================
         function initBackgrounds() {
-            // Устанавливаем фоновые изображения
             bgElements.forEach((element, index) => {
                 if (element && backgroundImages[index]) {
                     element.style.backgroundImage = `url('${backgroundImages[index]}')`;
                 }
             });
 
-            // Показываем первое изображение
             if (bgElements[0]) {
                 bgElements[0].classList.add('active');
             }
         }
 
         function changeBackground() {
-            // Убираем активный класс со всех фонов
             bgElements.forEach(bg => {
                 if (bg) bg.classList.remove('active');
             });
 
-            // Переходим к следующему фону
             backgroundIndex = (backgroundIndex + 1) % bgElements.length;
 
-            // Активируем новый фон
             if (bgElements[backgroundIndex]) {
                 bgElements[backgroundIndex].classList.add('active');
             }
         }
 
-        // ============================================
-        // СИСТЕМА ЧАСТИЦ
-        // ============================================
-        function createParticles() {
-            const container = document.getElementById('particlesContainer');
-            if (!container) return;
-
-            const particleCount = 35;
-
-            for (let i = 0; i < particleCount; i++) {
-                setTimeout(() => {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-
-                    // Случайный размер частицы
-                    const size = Math.random() * 5 + 2;
-                    particle.style.width = size + 'px';
-                    particle.style.height = size + 'px';
-
-                    // Случайная начальная позиция по X
-                    const startX = Math.random() * 100;
-                    particle.style.left = startX + '%';
-
-                    // Случайное смещение по X во время анимации
-                    const translateX = (Math.random() - 0.5) * 200;
-                    particle.style.setProperty('--start-x', '0px');
-                    particle.style.setProperty('--end-x', translateX + 'px');
-
-                    // Случайная длительность анимации
-                    const duration = Math.random() * 15 + 20;
-                    const delay = Math.random() * 8;
-
-                    particle.style.animation = `particleFloat ${duration}s linear ${delay}s infinite`;
-
-                    container.appendChild(particle);
-                }, i * 80);
-            }
-        }
-
-        // ============================================
-        // ОБНОВЛЕНИЕ СТАТУСОВ
-        // ============================================
         function updateStatusDisplay(newStatus) {
             if (!newStatus) return;
 
-            // Добавляем новый статус в историю
             statusHistory.push(newStatus);
 
-            // Ограничиваем историю 5 элементами
             if (statusHistory.length > 5) {
                 statusHistory.shift();
             }
 
-            // Обновляем отображение
             const container = document.getElementById('statusContainer');
             if (!container) return;
 
@@ -773,15 +581,13 @@
                 const line = document.createElement('div');
                 line.className = 'status-line';
 
-                // Обрезаем длинные строки
                 const maxLength = 65;
                 const displayStatus = status.length > maxLength 
-                    ? status.substring(0, maxLength - 3) + '...' 
+                    ? status.substring(0, maxLength - 3) 
                     : status;
 
                 line.textContent = displayStatus;
 
-                // Устанавливаем финальную прозрачность через CSS переменную
                 const opacities = [0.35, 0.45, 0.65, 0.85, 1];
                 line.style.setProperty('--final-opacity', opacities[index] || 1);
 
@@ -789,55 +595,28 @@
             });
         }
 
-        // ============================================
-        // ОБНОВЛЕНИЕ ИНФОРМАЦИИ О ФАЙЛАХ
-        // ============================================
-        function updateFileCounter() {
-            const counter = document.getElementById('fileCounter');
-            if (!counter) return;
-
-            if (filesTotal > 0) {
-                counter.textContent = `Файлов: ${filesDownloaded} / ${filesTotal}`;
-            } else if (filesDownloaded > 0) {
-                counter.textContent = `Файлов: ${filesDownloaded}`;
-            } else {
-                counter.textContent = 'Файлов: 0';
-            }
-        }
-
-        function updateServerInfo(info) {
-            const serverInfo = document.getElementById('serverInfo');
-            if (serverInfo && info) {
-                serverInfo.textContent = info;
-            }
-        }
-
-        // ============================================
-        // АВТОМАТИЧЕСКАЯ СМЕНА СТАТУСОВ
-        // ============================================
         const autoStatuses = [
-            'Подключение к серверу...',
-            'Получение информации о сервере...',
-            'Синхронизация данных...',
-            'Загрузка конфигурации...',
-            'Получение списка файлов...',
-            'Загрузка карты...',
-            'Загрузка моделей...',
-            'Загрузка текстур...',
-            'Загрузка материалов...',
-            'Загрузка звуков...',
-            'Загрузка скриптов...',
-            'Подготовка игрового мира...',
-            'Инициализация системы...',
-            'Проверка целостности файлов...',
-            'Оптимизация ресурсов...',
-            'Финальная подготовка...'
+            'Подключение к серверу',
+            'Получение информации о сервере',
+            'Синхронизация данных',
+            'Загрузка конфигурации',
+            'Получение списка файлов',
+            'Загрузка карты',
+            'Загрузка моделей',
+            'Загрузка текстур',
+            'Загрузка материалов',
+            'Загрузка звуков',
+            'Загрузка скриптов',
+            'Подготовка игрового мира',
+            'Инициализация системы',
+            'Проверка целостности файлов',
+            'Оптимизация ресурсов',
+            'Финальная подготовка'
         ];
 
         let autoStatusIndex = 0;
 
         function autoUpdateStatus() {
-            // Обновляем только если GMod не активен
             if (!isGmodActive && currentProgress < 95) {
                 const status = autoStatuses[autoStatusIndex % autoStatuses.length];
                 updateStatusDisplay(status);
@@ -845,18 +624,10 @@
             }
         }
 
-        // ============================================
-        // GARRY'S MOD API ФУНКЦИИ
-        // ============================================
-
-        /**
-         * Вызывается когда получена информация о сервере
-         */
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
             isGmodActive = true;
 
             if (servername) {
-                updateServerInfo(servername);
                 updateStatusDisplay('Подключено к: ' + servername);
             }
 
@@ -869,9 +640,6 @@
             }
         }
 
-        /**
-         * Вызывается при изменении статуса загрузки
-         */
         function SetStatusChanged(status) {
             isGmodActive = true;
 
@@ -880,184 +648,92 @@
             }
         }
 
-        /**
-         * Вызывается когда начинается загрузка файла
-         */
         function DownloadingFile(fileName) {
             isGmodActive = true;
 
             if (fileName) {
-                // Показываем короткое имя файла
                 const pathParts = fileName.split('/');
                 const shortName = pathParts[pathParts.length - 1];
                 
-                // Если имя все еще длинное, обрезаем
                 const displayName = shortName.length > 45 
-                    ? '...' + shortName.substring(shortName.length - 42) 
+                    ? shortName.substring(shortName.length - 42) 
                     : shortName;
 
                 updateStatusDisplay('Загрузка: ' + displayName);
             }
         }
 
-        /**
-         * Устанавливает количество необходимых файлов
-         */
         function SetFilesNeeded(needed) {
             isGmodActive = true;
             filesTotal = parseInt(needed) || 0;
-            updateFileCounter();
             updateStatusDisplay('Необходимо загрузить файлов: ' + needed);
         }
 
-        /**
-         * Устанавливает общее количество файлов
-         */
         function SetFilesTotal(total) {
             isGmodActive = true;
             filesTotal = parseInt(total) || 0;
-            updateFileCounter();
             updateStatusDisplay('Всего файлов: ' + total);
         }
 
-        /**
-         * Обновляет количество загруженных файлов
-         */
         function SetFilesDownloaded(downloaded) {
             isGmodActive = true;
             filesDownloaded = parseInt(downloaded) || 0;
-            updateFileCounter();
         }
 
-        /**
-         * Устанавливает прогресс загрузки (0-100)
-         */
         function SetLoadProgress(progress) {
             isGmodActive = true;
             currentProgress = parseFloat(progress) || 0;
 
-            // Ограничиваем значение
             if (currentProgress > 100) {
                 currentProgress = 100;
             }
 
-            // Если загрузка завершена
             if (currentProgress >= 100) {
-                updateStatusDisplay('Загрузка завершена!');
+                updateStatusDisplay('Загрузка завершена');
                 
-                // Плавное исчезновение через 800ms
                 setTimeout(() => {
                     const mainContent = document.querySelector('.main-content');
                     if (mainContent) {
                         mainContent.classList.add('fade-out');
                     }
 
-                    // Полное скрытие через 2 секунды
                     setTimeout(() => {
                         document.body.style.display = 'none';
                     }, 1200);
                 }, 800);
             } else {
-                // Обновляем статус с процентами
-                updateStatusDisplay(`Загрузка... ${Math.floor(currentProgress)}%`);
+                updateStatusDisplay(`Загрузка ${Math.floor(currentProgress)}%`);
             }
         }
 
-        // ============================================
-        // ИНИЦИАЛИЗАЦИЯ
-        // ============================================
         function initialize() {
             console.log('Lost Underground - Загрузка инициализирована');
 
-            // Инициализируем фоны
             initBackgrounds();
 
-            // Создаем частицы
-            createParticles();
-
-            // Запускаем смену фонов каждые 7 секунд
             setInterval(changeBackground, 7000);
 
-            // Запускаем автоматическое обновление статусов каждые 3.5 секунды
             setInterval(autoUpdateStatus, 3500);
 
-            // Первое обновление статуса через 1.5 секунды
             setTimeout(() => {
                 if (!isGmodActive) {
-                    updateStatusDisplay('Установка соединения...');
-                    updateServerInfo('Lost Underground');
+                    updateStatusDisplay('Установка соединения');
                 }
             }, 1500);
 
-            // Симуляция начального прогресса
             setTimeout(() => {
                 if (!isGmodActive) {
-                    updateStatusDisplay('Получение данных сервера...');
+                    updateStatusDisplay('Получение данных сервера');
                 }
             }, 4000);
         }
 
-        // ============================================
-        // ДЕМО РЕЖИМ (для тестирования без GMod)
-        // ============================================
-        // Раскомментируйте этот блок для тестирования
-        /*
-        function startDemo() {
-            let demoProgress = 0;
-            let demoFiles = 0;
-
-            const demoInterval = setInterval(() => {
-                if (demoProgress >= 100) {
-                    clearInterval(demoInterval);
-                    return;
-                }
-
-                // Увеличиваем прогресс
-                demoProgress += Math.random() * 2 + 0.5;
-                if (demoProgress > 100) demoProgress = 100;
-
-                // Увеличиваем файлы
-                if (Math.random() > 0.5) {
-                    demoFiles += Math.floor(Math.random() * 3) + 1;
-                }
-
-                // Обновляем
-                SetFilesTotal(150);
-                SetFilesDownloaded(demoFiles);
-                SetLoadProgress(demoProgress);
-
-                // Случайно показываем загрузку файлов
-                if (Math.random() > 0.7) {
-                    const testFiles = [
-                        'models/player/player.mdl',
-                        'materials/concrete/concretewall001.vtf',
-                        'sound/ambient/atmosphere.mp3',
-                        'maps/gm_construct.bsp',
-                        'materials/metal/metalfloor001.vmt',
-                        'models/props/prop_barrel.mdl',
-                        'sound/weapons/ak47_fire.wav'
-                    ];
-                    const randomFile = testFiles[Math.floor(Math.random() * testFiles.length)];
-                    DownloadingFile(randomFile);
-                }
-            }, 300);
-        }
-
-        // Запускаем демо через 2 секунды после загрузки
-        setTimeout(startDemo, 2000);
-        */
-
-        // ============================================
-        // ЗАПУСК ПРИЛОЖЕНИЯ
-        // ============================================
-        // Ждем полной загрузки DOM
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initialize);
         } else {
             initialize();
         }
 
-        // Обработка ошибок загрузки изображений
         window.addEventListener('error', function(e) {
             if (e.target.tagName === 'IMG') {
                 console.warn('Не удалось загрузить изображение:', e.target.src);
