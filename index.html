@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Загрузка</title>
+    <title>Lost Underground - Загрузка</title>
     <style>
+        /* ============================================
+           БАЗОВЫЕ СТИЛИ И СБРОС
+           ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -13,20 +16,33 @@
 
         html, body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #000000;
+            background: rgb(11, 11, 11);
             overflow: hidden;
             height: 100vh;
             width: 100vw;
             color: white;
+            position: relative;
         }
 
-        .background {
+        /* ============================================
+           ФОНОВЫЕ СЛОИ И ИЗОБРАЖЕНИЯ
+           ============================================ */
+        .background-layer {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
+        }
+
+        .bg-image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
 
         .bg-image {
@@ -37,138 +53,619 @@
             height: 100%;
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             opacity: 0;
-            transition: opacity 2s ease-in-out;
+            transition: opacity 3s ease-in-out;
         }
 
         .bg-image.active {
-            opacity: 0.7;
+            opacity: 0.4;
         }
 
-        .bg-overlay {
+        /* Первый слой затемнения */
+        .bg-overlay-dark {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1;
+            background: linear-gradient(
+                135deg,
+                rgba(11, 11, 11, 0.85) 0%,
+                rgba(25, 25, 25, 0.75) 50%,
+                rgba(11, 11, 11, 0.85) 100%
+            );
+            z-index: 2;
         }
 
-        .container {
+        /* Второй слой с градиентом */
+        .bg-overlay-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(25, 25, 25, 0.3) 0%,
+                rgba(11, 11, 11, 0.8) 70%,
+                rgb(11, 11, 11) 100%
+            );
+            z-index: 3;
+            animation: gradientPulse 8s ease-in-out infinite;
+        }
+
+        /* Сетка для эффекта глубины */
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 4;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Виньетка по краям */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 200px rgba(0, 0, 0, 0.8);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* ============================================
+           СИСТЕМА ЧАСТИЦ
+           ============================================ */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(
+                circle,
+                rgba(255, 255, 255, 0.6) 0%,
+                rgba(255, 255, 255, 0.2) 50%,
+                transparent 100%
+            );
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* ============================================
+           ГЛАВНЫЙ КОНТЕЙНЕР
+           ============================================ */
+        .main-content {
             position: relative;
-            z-index: 10;
+            z-index: 100;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             width: 100vw;
-            padding-top: -100px;
+            padding: 40px;
         }
 
-        .spinner {
-            width: 120px;
-            height: 120px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid rgba(255, 255, 255, 0.9);
+        /* ============================================
+           СПИННЕР И ЛОГОТИП
+           ============================================ */
+        .spinner-wrapper {
+            position: relative;
+            margin-bottom: 50px;
+            animation: fadeInScale 1.5s ease-out forwards;
+            transform: translateY(-40px);
+        }
+
+        /* Внешнее свечение */
+        .spinner-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(
+                circle,
+                rgba(255, 255, 255, 0.15) 0%,
+                transparent 70%
+            );
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            background: transparent;
-            margin-bottom: 25px;
-            margin-top: -80px;
+            animation: glowPulse 3s ease-in-out infinite;
+            z-index: 1;
         }
 
-        .title {
-            font-size: 42px;
+        /* Внешний крутящийся круг */
+        .spinner-outer {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            border-top: 3px solid rgba(255, 255, 255, 0.8);
+            border-right: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: spinRotate 2s linear infinite;
+            z-index: 2;
+            background: rgba(25, 25, 25, 0.4);
+            box-shadow: 
+                0 0 30px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Средний круг */
+        .spinner-middle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130px;
+            height: 130px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            background: rgba(11, 11, 11, 0.6);
+            box-shadow: 
+                inset 0 0 30px rgba(0, 0, 0, 0.8),
+                0 0 20px rgba(255, 255, 255, 0.1);
+            z-index: 3;
+        }
+
+        /* Внутренний круг с логотипом */
+        .spinner-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(25, 25, 25, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 0 20px rgba(0, 0, 0, 0.9),
+                0 0 15px rgba(255, 255, 255, 0.15);
+            z-index: 4;
+        }
+
+        /* Логотип в центре */
+        .logo-image {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            animation: logoFloat 4s ease-in-out infinite;
+        }
+
+        /* Дополнительный крутящийся круг (обратное вращение) */
+        .spinner-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 165px;
+            height: 165px;
+            border: 2px solid transparent;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+            border-left: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            animation: spinRotateReverse 3s linear infinite;
+            z-index: 1;
+        }
+
+        /* ============================================
+           ТЕКСТОВЫЕ БЛОКИ
+           ============================================ */
+        .title-section {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 1.2s ease-out 0.3s both;
+        }
+
+        .main-title {
+            font-size: 56px;
             font-weight: 700;
             color: white;
-            margin-bottom: 10px;
-            letter-spacing: 4px;
+            letter-spacing: 6px;
+            margin-bottom: 12px;
+            text-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.3),
+                0 4px 10px rgba(0, 0, 0, 0.8);
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(200, 200, 200, 1) 100%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .subtitle {
-            font-size: 18px;
-            color: white;
-            margin-bottom: 60px;
-            opacity: 0.8;
-            letter-spacing: 2px;
+            font-size: 20px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 3px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
         }
 
-        .text-wrapper {
+        /* ============================================
+           СТАТУСЫ ЗАГРУЗКИ
+           ============================================ */
+        .status-container {
+            width: 90%;
+            max-width: 1000px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
-            width: 90%;
-            max-width: 900px;
+            gap: 18px;
+            padding: 30px;
+            background: linear-gradient(
+                145deg,
+                rgba(25, 25, 25, 0.3) 0%,
+                rgba(11, 11, 11, 0.5) 100%
+            );
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 
+                0 10px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            animation: fadeInUp 1.5s ease-out 0.6s both;
         }
 
         .status-line {
             color: white;
             text-align: center;
-            transition: all 0.4s ease;
+            transition: all 0.5s ease;
+            letter-spacing: 1.5px;
+            line-height: 1.4;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            animation: statusSlideIn 0.6s ease-out forwards;
+            word-wrap: break-word;
+            max-width: 100%;
         }
 
+        /* Градация размеров статусов (сверху вниз) */
         .status-line:nth-child(1) {
-            font-size: 14px;
-            opacity: 0.4;
+            font-size: 13px;
+            opacity: 0.35;
+            font-weight: 300;
+            animation-delay: 0s;
         }
 
         .status-line:nth-child(2) {
-            font-size: 16px;
-            opacity: 0.5;
+            font-size: 15px;
+            opacity: 0.45;
+            font-weight: 300;
+            animation-delay: 0.1s;
         }
 
         .status-line:nth-child(3) {
             font-size: 18px;
-            opacity: 0.7;
+            opacity: 0.65;
+            font-weight: 400;
+            animation-delay: 0.2s;
         }
 
         .status-line:nth-child(4) {
             font-size: 22px;
             opacity: 0.85;
+            font-weight: 500;
+            animation-delay: 0.3s;
         }
 
         .status-line:nth-child(5) {
             font-size: 28px;
             opacity: 1;
             font-weight: 600;
+            animation-delay: 0.4s;
+            text-shadow: 
+                0 0 15px rgba(255, 255, 255, 0.4),
+                0 4px 10px rgba(0, 0, 0, 0.8);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* ============================================
+           ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ
+           ============================================ */
+        .info-footer {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1.5px;
+            font-family: 'Courier New', monospace;
+            animation: fadeIn 2s ease-out 1.5s both;
+        }
+
+        .info-item {
+            padding: 8px 16px;
+            background: rgba(25, 25, 25, 0.6);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ============================================
+           АНИМАЦИИ
+           ============================================ */
+        @keyframes gradientPulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: translateY(-40px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(-40px) scale(1);
+            }
+        }
+
+        @keyframes spinRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spinRotateReverse {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(-360deg);
+            }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-3px) scale(1.05);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes statusSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+                filter: blur(5px);
+            }
+            to {
+                opacity: var(--final-opacity, 1);
+                transform: translateX(0);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translate(var(--start-x), 100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(var(--end-x), -100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeOutAll {
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOutAll 1.2s ease-out forwards;
+        }
+
+        /* ============================================
+           АДАПТИВНОСТЬ
+           ============================================ */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 38px;
+                letter-spacing: 4px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .spinner-outer {
+                width: 120px;
+                height: 120px;
+            }
+
+            .spinner-middle {
+                width: 100px;
+                height: 100px;
+            }
+
+            .spinner-inner {
+                width: 75px;
+                height: 75px;
+            }
+
+            .logo-image {
+                width: 65px;
+                height: 65px;
+            }
+
+            .status-line:nth-child(1) { font-size: 11px; }
+            .status-line:nth-child(2) { font-size: 13px; }
+            .status-line:nth-child(3) { font-size: 15px; }
+            .status-line:nth-child(4) { font-size: 18px; }
+            .status-line:nth-child(5) { font-size: 22px; }
+
+            .info-footer {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="background">
-        <div class="bg-image active" id="bg1"></div>
-        <div class="bg-image" id="bg2"></div>
-        <div class="bg-image" id="bg3"></div>
-        <div class="bg-overlay"></div>
+    <!-- ============================================
+         ФОНОВЫЕ СЛОИ
+         ============================================ -->
+    <div class="background-layer">
+        <div class="bg-image-container">
+            <div class="bg-image" id="bgImage1"></div>
+            <div class="bg-image" id="bgImage2"></div>
+            <div class="bg-image" id="bgImage3"></div>
+        </div>
+        <div class="bg-overlay-dark"></div>
+        <div class="bg-overlay-gradient"></div>
+        <div class="grid-pattern"></div>
+        <div class="vignette"></div>
     </div>
 
-    <div class="container">
-        <div class="spinner"></div>
-        <div class="title">Lost Underground</div>
-        <div class="subtitle">подземное выживание</div>
-        
-        <div class="text-wrapper" id="statusLines">
+    <!-- ============================================
+         ЧАСТИЦЫ
+         ============================================ -->
+    <div class="particles-container" id="particlesContainer"></div>
+
+    <!-- ============================================
+         ОСНОВНОЙ КОНТЕНТ
+         ============================================ -->
+    <div class="main-content">
+        <!-- Спиннер с логотипом -->
+        <div class="spinner-wrapper">
+            <div class="spinner-glow"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-outer">
+                <div class="spinner-middle">
+                    <div class="spinner-inner">
+                        <img src="https://cdn.discordapp.com/attachments/1373657384798388265/1442422579607633921/1mb.png?ex=69256035&is=69240eb5&hm=c54cd16adc755b9512aa9503530b68071f5f450321b084f10e2fefc266443829&" 
+                             alt="Logo" 
+                             class="logo-image"
+                             onerror="this.style.display='none'">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Заголовки -->
+        <div class="title-section">
+            <h1 class="main-title">LOST UNDERGROUND</h1>
+            <p class="subtitle">подземное выживание</p>
+        </div>
+
+        <!-- Статусы загрузки -->
+        <div class="status-container" id="statusContainer">
             <div class="status-line">Подготовка...</div>
-            <div class="status-line">Подключение...</div>
+            <div class="status-line">Подключение к серверу...</div>
             <div class="status-line">Инициализация...</div>
-            <div class="status-line">Загрузка...</div>
+            <div class="status-line">Загрузка ресурсов...</div>
             <div class="status-line">Ожидание...</div>
+        </div>
+
+        <!-- Футер с информацией -->
+        <div class="info-footer">
+            <div class="info-item">
+                <span id="serverInfo">Подключение...</span>
+            </div>
+            <div class="info-item">
+                <span id="fileCounter">Файлов: 0</span>
+            </div>
         </div>
     </div>
 
+    <!-- ============================================
+         JAVASCRIPT ЛОГИКА
+         ============================================ -->
     <script>
-        let statusHistory = ['Подготовка...', 'Подключение...', 'Инициализация...', 'Загрузка...', 'Ожидание...'];
-        let isGmodActive = false;
-        let currentBg = 0;
+        // ============================================
+        // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        // ============================================
+        let statusHistory = [
+            'Подготовка...',
+            'Подключение к серверу...',
+            'Инициализация...',
+            'Загрузка ресурсов...',
+            'Ожидание...'
+        ];
 
+        let currentProgress = 0;
+        let filesDownloaded = 0;
+        let filesTotal = 0;
+        let isGmodActive = false;
+        let backgroundIndex = 0;
+
+        // Массив фоновых изображений
         const backgroundImages = [
             'https://garry-s-mod.ru/wp-content/uploads/2022/02/24787.jpg',
             'https://garry-s-mod.ru/wp-content/uploads/2020/09/35878.jpg',
@@ -176,88 +673,397 @@
         ];
 
         const bgElements = [
-            document.getElementById('bg1'),
-            document.getElementById('bg2'),
-            document.getElementById('bg3')
+            document.getElementById('bgImage1'),
+            document.getElementById('bgImage2'),
+            document.getElementById('bgImage3')
         ];
 
-        bgElements.forEach((el, index) => {
-            el.style.backgroundImage = `url('${backgroundImages[index]}')`;
-        });
+        // ============================================
+        // СИСТЕМА ФОНОВЫХ ИЗОБРАЖЕНИЙ
+        // ============================================
+        function initBackgrounds() {
+            // Устанавливаем фоновые изображения
+            bgElements.forEach((element, index) => {
+                if (element && backgroundImages[index]) {
+                    element.style.backgroundImage = `url('${backgroundImages[index]}')`;
+                }
+            });
 
-        function changeBackground() {
-            bgElements.forEach(bg => bg.classList.remove('active'));
-            bgElements[currentBg].classList.add('active');
-            currentBg = (currentBg + 1) % bgElements.length;
+            // Показываем первое изображение
+            if (bgElements[0]) {
+                bgElements[0].classList.add('active');
+            }
         }
 
-        function updateStatus(newStatus) {
+        function changeBackground() {
+            // Убираем активный класс со всех фонов
+            bgElements.forEach(bg => {
+                if (bg) bg.classList.remove('active');
+            });
+
+            // Переходим к следующему фону
+            backgroundIndex = (backgroundIndex + 1) % bgElements.length;
+
+            // Активируем новый фон
+            if (bgElements[backgroundIndex]) {
+                bgElements[backgroundIndex].classList.add('active');
+            }
+        }
+
+        // ============================================
+        // СИСТЕМА ЧАСТИЦ
+        // ============================================
+        function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            if (!container) return;
+
+            const particleCount = 35;
+
+            for (let i = 0; i < particleCount; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+
+                    // Случайный размер частицы
+                    const size = Math.random() * 5 + 2;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+
+                    // Случайная начальная позиция по X
+                    const startX = Math.random() * 100;
+                    particle.style.left = startX + '%';
+
+                    // Случайное смещение по X во время анимации
+                    const translateX = (Math.random() - 0.5) * 200;
+                    particle.style.setProperty('--start-x', '0px');
+                    particle.style.setProperty('--end-x', translateX + 'px');
+
+                    // Случайная длительность анимации
+                    const duration = Math.random() * 15 + 20;
+                    const delay = Math.random() * 8;
+
+                    particle.style.animation = `particleFloat ${duration}s linear ${delay}s infinite`;
+
+                    container.appendChild(particle);
+                }, i * 80);
+            }
+        }
+
+        // ============================================
+        // ОБНОВЛЕНИЕ СТАТУСОВ
+        // ============================================
+        function updateStatusDisplay(newStatus) {
+            if (!newStatus) return;
+
+            // Добавляем новый статус в историю
             statusHistory.push(newStatus);
+
+            // Ограничиваем историю 5 элементами
             if (statusHistory.length > 5) {
                 statusHistory.shift();
             }
-            
-            const container = document.getElementById('statusLines');
+
+            // Обновляем отображение
+            const container = document.getElementById('statusContainer');
+            if (!container) return;
+
             container.innerHTML = '';
-            
-            statusHistory.forEach((status) => {
+
+            statusHistory.forEach((status, index) => {
                 const line = document.createElement('div');
                 line.className = 'status-line';
-                line.textContent = status.length > 60 ? status.substring(0, 57) + '...' : status;
+
+                // Обрезаем длинные строки
+                const maxLength = 65;
+                const displayStatus = status.length > maxLength 
+                    ? status.substring(0, maxLength - 3) + '...' 
+                    : status;
+
+                line.textContent = displayStatus;
+
+                // Устанавливаем финальную прозрачность через CSS переменную
+                const opacities = [0.35, 0.45, 0.65, 0.85, 1];
+                line.style.setProperty('--final-opacity', opacities[index] || 1);
+
                 container.appendChild(line);
             });
         }
 
+        // ============================================
+        // ОБНОВЛЕНИЕ ИНФОРМАЦИИ О ФАЙЛАХ
+        // ============================================
+        function updateFileCounter() {
+            const counter = document.getElementById('fileCounter');
+            if (!counter) return;
+
+            if (filesTotal > 0) {
+                counter.textContent = `Файлов: ${filesDownloaded} / ${filesTotal}`;
+            } else if (filesDownloaded > 0) {
+                counter.textContent = `Файлов: ${filesDownloaded}`;
+            } else {
+                counter.textContent = 'Файлов: 0';
+            }
+        }
+
+        function updateServerInfo(info) {
+            const serverInfo = document.getElementById('serverInfo');
+            if (serverInfo && info) {
+                serverInfo.textContent = info;
+            }
+        }
+
+        // ============================================
+        // АВТОМАТИЧЕСКАЯ СМЕНА СТАТУСОВ
+        // ============================================
+        const autoStatuses = [
+            'Подключение к серверу...',
+            'Получение информации о сервере...',
+            'Синхронизация данных...',
+            'Загрузка конфигурации...',
+            'Получение списка файлов...',
+            'Загрузка карты...',
+            'Загрузка моделей...',
+            'Загрузка текстур...',
+            'Загрузка материалов...',
+            'Загрузка звуков...',
+            'Загрузка скриптов...',
+            'Подготовка игрового мира...',
+            'Инициализация системы...',
+            'Проверка целостности файлов...',
+            'Оптимизация ресурсов...',
+            'Финальная подготовка...'
+        ];
+
+        let autoStatusIndex = 0;
+
+        function autoUpdateStatus() {
+            // Обновляем только если GMod не активен
+            if (!isGmodActive && currentProgress < 95) {
+                const status = autoStatuses[autoStatusIndex % autoStatuses.length];
+                updateStatusDisplay(status);
+                autoStatusIndex++;
+            }
+        }
+
+        // ============================================
+        // GARRY'S MOD API ФУНКЦИИ
+        // ============================================
+
+        /**
+         * Вызывается когда получена информация о сервере
+         */
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
             isGmodActive = true;
+
+            if (servername) {
+                updateServerInfo(servername);
+                updateStatusDisplay('Подключено к: ' + servername);
+            }
+
             if (mapname) {
-                updateStatus('Карта: ' + mapname);
+                updateStatusDisplay('Карта: ' + mapname);
+            }
+
+            if (gamemode) {
+                updateStatusDisplay('Режим игры: ' + gamemode);
             }
         }
 
+        /**
+         * Вызывается при изменении статуса загрузки
+         */
         function SetStatusChanged(status) {
             isGmodActive = true;
+
             if (status) {
-                updateStatus(status);
+                updateStatusDisplay(status);
             }
         }
 
+        /**
+         * Вызывается когда начинается загрузка файла
+         */
         function DownloadingFile(fileName) {
             isGmodActive = true;
+
             if (fileName) {
-                const shortName = fileName.length > 50 ? '...' + fileName.substring(fileName.length - 47) : fileName;
-                updateStatus('Загрузка: ' + shortName);
+                // Показываем короткое имя файла
+                const pathParts = fileName.split('/');
+                const shortName = pathParts[pathParts.length - 1];
+                
+                // Если имя все еще длинное, обрезаем
+                const displayName = shortName.length > 45 
+                    ? '...' + shortName.substring(shortName.length - 42) 
+                    : shortName;
+
+                updateStatusDisplay('Загрузка: ' + displayName);
             }
         }
 
+        /**
+         * Устанавливает количество необходимых файлов
+         */
         function SetFilesNeeded(needed) {
             isGmodActive = true;
+            filesTotal = parseInt(needed) || 0;
+            updateFileCounter();
+            updateStatusDisplay('Необходимо загрузить файлов: ' + needed);
         }
 
+        /**
+         * Устанавливает общее количество файлов
+         */
         function SetFilesTotal(total) {
             isGmodActive = true;
+            filesTotal = parseInt(total) || 0;
+            updateFileCounter();
+            updateStatusDisplay('Всего файлов: ' + total);
         }
 
+        /**
+         * Обновляет количество загруженных файлов
+         */
         function SetFilesDownloaded(downloaded) {
             isGmodActive = true;
+            filesDownloaded = parseInt(downloaded) || 0;
+            updateFileCounter();
         }
 
+        /**
+         * Устанавливает прогресс загрузки (0-100)
+         */
         function SetLoadProgress(progress) {
             isGmodActive = true;
-            const prog = parseFloat(progress) || 0;
-            
-            if (prog >= 100) {
+            currentProgress = parseFloat(progress) || 0;
+
+            // Ограничиваем значение
+            if (currentProgress > 100) {
+                currentProgress = 100;
+            }
+
+            // Если загрузка завершена
+            if (currentProgress >= 100) {
+                updateStatusDisplay('Загрузка завершена!');
+                
+                // Плавное исчезновение через 800ms
                 setTimeout(() => {
-                    document.body.style.transition = 'opacity 1s';
-                    document.body.style.opacity = '0';
+                    const mainContent = document.querySelector('.main-content');
+                    if (mainContent) {
+                        mainContent.classList.add('fade-out');
+                    }
+
+                    // Полное скрытие через 2 секунды
                     setTimeout(() => {
                         document.body.style.display = 'none';
-                    }, 1000);
-                }, 500);
+                    }, 1200);
+                }, 800);
+            } else {
+                // Обновляем статус с процентами
+                updateStatusDisplay(`Загрузка... ${Math.floor(currentProgress)}%`);
             }
         }
 
-        setInterval(changeBackground, 6000);
+        // ============================================
+        // ИНИЦИАЛИЗАЦИЯ
+        // ============================================
+        function initialize() {
+            console.log('Lost Underground - Загрузка инициализирована');
+
+            // Инициализируем фоны
+            initBackgrounds();
+
+            // Создаем частицы
+            createParticles();
+
+            // Запускаем смену фонов каждые 7 секунд
+            setInterval(changeBackground, 7000);
+
+            // Запускаем автоматическое обновление статусов каждые 3.5 секунды
+            setInterval(autoUpdateStatus, 3500);
+
+            // Первое обновление статуса через 1.5 секунды
+            setTimeout(() => {
+                if (!isGmodActive) {
+                    updateStatusDisplay('Установка соединения...');
+                    updateServerInfo('Lost Underground');
+                }
+            }, 1500);
+
+            // Симуляция начального прогресса
+            setTimeout(() => {
+                if (!isGmodActive) {
+                    updateStatusDisplay('Получение данных сервера...');
+                }
+            }, 4000);
+        }
+
+        // ============================================
+        // ДЕМО РЕЖИМ (для тестирования без GMod)
+        // ============================================
+        // Раскомментируйте этот блок для тестирования
+        /*
+        function startDemo() {
+            let demoProgress = 0;
+            let demoFiles = 0;
+
+            const demoInterval = setInterval(() => {
+                if (demoProgress >= 100) {
+                    clearInterval(demoInterval);
+                    return;
+                }
+
+                // Увеличиваем прогресс
+                demoProgress += Math.random() * 2 + 0.5;
+                if (demoProgress > 100) demoProgress = 100;
+
+                // Увеличиваем файлы
+                if (Math.random() > 0.5) {
+                    demoFiles += Math.floor(Math.random() * 3) + 1;
+                }
+
+                // Обновляем
+                SetFilesTotal(150);
+                SetFilesDownloaded(demoFiles);
+                SetLoadProgress(demoProgress);
+
+                // Случайно показываем загрузку файлов
+                if (Math.random() > 0.7) {
+                    const testFiles = [
+                        'models/player/player.mdl',
+                        'materials/concrete/concretewall001.vtf',
+                        'sound/ambient/atmosphere.mp3',
+                        'maps/gm_construct.bsp',
+                        'materials/metal/metalfloor001.vmt',
+                        'models/props/prop_barrel.mdl',
+                        'sound/weapons/ak47_fire.wav'
+                    ];
+                    const randomFile = testFiles[Math.floor(Math.random() * testFiles.length)];
+                    DownloadingFile(randomFile);
+                }
+            }, 300);
+        }
+
+        // Запускаем демо через 2 секунды после загрузки
+        setTimeout(startDemo, 2000);
+        */
+
+        // ============================================
+        // ЗАПУСК ПРИЛОЖЕНИЯ
+        // ============================================
+        // Ждем полной загрузки DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+
+        // Обработка ошибок загрузки изображений
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'IMG') {
+                console.warn('Не удалось загрузить изображение:', e.target.src);
+            }
+        }, true);
+
     </script>
 </body>
 </html>
