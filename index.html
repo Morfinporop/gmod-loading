@@ -42,7 +42,7 @@
         }
 
         .bg-image.active {
-            opacity: 1;
+            opacity: 0.7;
         }
 
         .bg-overlay {
@@ -51,7 +51,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 1;
         }
 
@@ -64,6 +64,7 @@
             align-items: center;
             height: 100vh;
             width: 100vw;
+            padding-top: -100px;
         }
 
         .spinner {
@@ -73,15 +74,25 @@
             border-top: 4px solid rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 30px;
+            background: transparent;
+            margin-bottom: 25px;
+            margin-top: -80px;
         }
 
         .title {
-            font-size: 48px;
+            font-size: 42px;
             font-weight: 700;
             color: white;
-            margin-bottom: 60px;
+            margin-bottom: 10px;
             letter-spacing: 4px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: white;
+            margin-bottom: 60px;
+            opacity: 0.8;
+            letter-spacing: 2px;
         }
 
         .text-wrapper {
@@ -133,15 +144,16 @@
 </head>
 <body>
     <div class="background">
-        <div class="bg-image" id="bg1" style="background-image: url('https://garry-s-mod.ru/wp-content/uploads/2022/02/24787.jpg');"></div>
-        <div class="bg-image" id="bg2" style="background-image: url('https://garry-s-mod.ru/wp-content/uploads/2020/09/35878.jpg');"></div>
-        <div class="bg-image" id="bg3" style="background-image: url('https://garry-s-mod.ru/wp-content/uploads/2020/09/14656.jpg');"></div>
+        <div class="bg-image active" id="bg1"></div>
+        <div class="bg-image" id="bg2"></div>
+        <div class="bg-image" id="bg3"></div>
         <div class="bg-overlay"></div>
     </div>
 
     <div class="container">
         <div class="spinner"></div>
-        <div class="title">LOST</div>
+        <div class="title">Lost Underground</div>
+        <div class="subtitle">подземное выживание</div>
         
         <div class="text-wrapper" id="statusLines">
             <div class="status-line">Подготовка...</div>
@@ -156,15 +168,27 @@
         let statusHistory = ['Подготовка...', 'Подключение...', 'Инициализация...', 'Загрузка...', 'Ожидание...'];
         let isGmodActive = false;
         let currentBg = 0;
-        const backgrounds = ['bg1', 'bg2', 'bg3'];
+
+        const backgroundImages = [
+            'https://garry-s-mod.ru/wp-content/uploads/2022/02/24787.jpg',
+            'https://garry-s-mod.ru/wp-content/uploads/2020/09/35878.jpg',
+            'https://garry-s-mod.ru/wp-content/uploads/2020/09/14656.jpg'
+        ];
+
+        const bgElements = [
+            document.getElementById('bg1'),
+            document.getElementById('bg2'),
+            document.getElementById('bg3')
+        ];
+
+        bgElements.forEach((el, index) => {
+            el.style.backgroundImage = `url('${backgroundImages[index]}')`;
+        });
 
         function changeBackground() {
-            backgrounds.forEach(bg => {
-                document.getElementById(bg).classList.remove('active');
-            });
-            
-            document.getElementById(backgrounds[currentBg]).classList.add('active');
-            currentBg = (currentBg + 1) % backgrounds.length;
+            bgElements.forEach(bg => bg.classList.remove('active'));
+            bgElements[currentBg].classList.add('active');
+            currentBg = (currentBg + 1) % bgElements.length;
         }
 
         function updateStatus(newStatus) {
@@ -233,7 +257,6 @@
             }
         }
 
-        changeBackground();
         setInterval(changeBackground, 6000);
     </script>
 </body>
