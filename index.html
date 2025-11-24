@@ -20,7 +20,44 @@
             color: white;
         }
 
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .bg-image.active {
+            opacity: 1;
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
         .container {
+            position: relative;
+            z-index: 10;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -36,48 +73,54 @@
             border-top: 4px solid rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 80px;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 60px;
+            letter-spacing: 4px;
         }
 
         .text-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             width: 90%;
             max-width: 900px;
         }
 
         .status-line {
-            color: rgba(255, 255, 255, 0.9);
+            color: white;
             text-align: center;
             transition: all 0.4s ease;
-            letter-spacing: 1px;
         }
 
         .status-line:nth-child(1) {
-            font-size: 12px;
-            opacity: 0.3;
-        }
-
-        .status-line:nth-child(2) {
             font-size: 14px;
             opacity: 0.4;
         }
 
-        .status-line:nth-child(3) {
+        .status-line:nth-child(2) {
             font-size: 16px;
-            opacity: 0.6;
+            opacity: 0.5;
+        }
+
+        .status-line:nth-child(3) {
+            font-size: 18px;
+            opacity: 0.7;
         }
 
         .status-line:nth-child(4) {
-            font-size: 20px;
-            opacity: 0.8;
+            font-size: 22px;
+            opacity: 0.85;
         }
 
         .status-line:nth-child(5) {
-            font-size: 26px;
+            font-size: 28px;
             opacity: 1;
             font-weight: 600;
         }
@@ -89,8 +132,16 @@
     </style>
 </head>
 <body>
+    <div class="background">
+        <div class="bg-image" id="bg1" style="background-image: url('https://garry-s-mod.ru/wp-content/uploads/2022/02/24787.jpg');"></div>
+        <div class="bg-image" id="bg2" style="background-image: url('https://garry-s-mod.ru/wp-content/uploads/2020/09/35878.jpg');"></div>
+        <div class="bg-image" id="bg3" style="background-image: url('https://garry-s-mod.ru/wp-content/uploads/2020/09/14656.jpg');"></div>
+        <div class="bg-overlay"></div>
+    </div>
+
     <div class="container">
         <div class="spinner"></div>
+        <div class="title">LOST</div>
         
         <div class="text-wrapper" id="statusLines">
             <div class="status-line">Подготовка...</div>
@@ -104,6 +155,17 @@
     <script>
         let statusHistory = ['Подготовка...', 'Подключение...', 'Инициализация...', 'Загрузка...', 'Ожидание...'];
         let isGmodActive = false;
+        let currentBg = 0;
+        const backgrounds = ['bg1', 'bg2', 'bg3'];
+
+        function changeBackground() {
+            backgrounds.forEach(bg => {
+                document.getElementById(bg).classList.remove('active');
+            });
+            
+            document.getElementById(backgrounds[currentBg]).classList.add('active');
+            currentBg = (currentBg + 1) % backgrounds.length;
+        }
 
         function updateStatus(newStatus) {
             statusHistory.push(newStatus);
@@ -120,28 +182,6 @@
                 line.textContent = status.length > 60 ? status.substring(0, 57) + '...' : status;
                 container.appendChild(line);
             });
-        }
-
-        const autoStatuses = [
-            'Подключение к серверу...',
-            'Получение данных...',
-            'Синхронизация...',
-            'Загрузка карты...',
-            'Загрузка моделей...',
-            'Загрузка текстур...',
-            'Загрузка звуков...',
-            'Подготовка...',
-            'Инициализация...',
-            'Финализация...'
-        ];
-
-        let autoIndex = 0;
-
-        function autoUpdate() {
-            if (!isGmodActive) {
-                updateStatus(autoStatuses[autoIndex % autoStatuses.length]);
-                autoIndex++;
-            }
         }
 
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
@@ -168,17 +208,14 @@
 
         function SetFilesNeeded(needed) {
             isGmodActive = true;
-            updateStatus('Необходимо файлов: ' + needed);
         }
 
         function SetFilesTotal(total) {
             isGmodActive = true;
-            updateStatus('Всего файлов: ' + total);
         }
 
         function SetFilesDownloaded(downloaded) {
             isGmodActive = true;
-            updateStatus('Загружено: ' + downloaded);
         }
 
         function SetLoadProgress(progress) {
@@ -196,11 +233,8 @@
             }
         }
 
-        setInterval(autoUpdate, 3000);
-
-        setTimeout(() => {
-            updateStatus('Подключение установлено');
-        }, 1000);
+        changeBackground();
+        setInterval(changeBackground, 6000);
     </script>
 </body>
 </html>
