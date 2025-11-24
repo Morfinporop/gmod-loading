@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Загрузка сервера</title>
+    <title>Загрузка</title>
     <style>
         * {
             margin: 0;
@@ -13,475 +13,99 @@
 
         html, body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000000;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
             color: white;
-            position: relative;
         }
 
-        .background-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(135deg, rgba(30, 20, 60, 0.9) 0%, rgba(10, 10, 30, 0.95) 100%),
-                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23000" width="100" height="100"/><circle cx="50" cy="50" r="40" fill="%23111"/><circle cx="10" cy="10" r="5" fill="%23222"/><circle cx="90" cy="90" r="8" fill="%23181828"/></svg>');
-            background-size: cover, 150px 150px;
-            z-index: 0;
-            animation: bgMove 20s linear infinite;
-        }
-
-        .background-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
-            z-index: 1;
-        }
-
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            background: radial-gradient(circle, rgba(120, 100, 255, 0.6) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: float linear infinite;
-        }
-
-        .main-container {
-            position: relative;
-            z-index: 10;
+        .container {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             width: 100vw;
-            perspective: 1000px;
         }
 
-        .spinner-container {
-            position: relative;
+        .spinner {
+            width: 120px;
+            height: 120px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
             margin-bottom: 80px;
-            animation: fadeInScale 1.2s ease-out forwards;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
         }
 
-        .spinner-outer {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, rgba(50, 40, 80, 0.3), rgba(20, 15, 40, 0.5));
+        .text-wrapper {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            box-shadow: 
-                0 0 60px rgba(120, 100, 255, 0.3),
-                inset 0 0 40px rgba(0, 0, 0, 0.4),
-                0 20px 60px rgba(0, 0, 0, 0.6);
-            position: relative;
-            animation: pulse 3s ease-in-out infinite;
-        }
-
-        .spinner-outer::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, 
-                rgba(120, 100, 255, 0.8),
-                rgba(80, 200, 255, 0.6),
-                rgba(200, 100, 255, 0.8),
-                rgba(120, 100, 255, 0.8)
-            );
-            background-size: 300% 300%;
-            animation: gradientRotate 3s linear infinite;
-            filter: blur(8px);
-            opacity: 0.7;
-            z-index: -1;
-        }
-
-        .spinner-middle {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, rgba(30, 25, 50, 0.9), rgba(15, 10, 30, 0.95));
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 
-                inset 0 0 30px rgba(0, 0, 0, 0.8),
-                0 0 30px rgba(120, 100, 255, 0.2);
-            position: relative;
-        }
-
-        .spinner-ring {
-            position: absolute;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            animation: spin 2s linear infinite;
-        }
-
-        .spinner-ring:nth-child(1) {
-            width: 160px;
-            height: 160px;
-            border-top-color: rgba(120, 100, 255, 0.8);
-            border-right-color: rgba(120, 100, 255, 0.4);
-            animation-duration: 1.5s;
-        }
-
-        .spinner-ring:nth-child(2) {
-            width: 130px;
-            height: 130px;
-            border-top-color: rgba(80, 200, 255, 0.8);
-            border-left-color: rgba(80, 200, 255, 0.4);
-            animation-duration: 2s;
-            animation-direction: reverse;
-        }
-
-        .spinner-ring:nth-child(3) {
-            width: 100px;
-            height: 100px;
-            border-top-color: rgba(200, 100, 255, 0.8);
-            border-right-color: rgba(200, 100, 255, 0.4);
-            animation-duration: 2.5s;
-        }
-
-        .spinner-center {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(120, 100, 255, 0.4) 0%, transparent 70%);
-            box-shadow: 
-                0 0 40px rgba(120, 100, 255, 0.6),
-                inset 0 0 20px rgba(120, 100, 255, 0.3);
-            animation: centerPulse 2s ease-in-out infinite;
-        }
-
-        .text-container {
-            position: relative;
+            gap: 20px;
             width: 90%;
-            max-width: 800px;
-            height: 400px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transform-style: preserve-3d;
-            animation: fadeIn 1.5s ease-out 0.5s both;
-        }
-
-        .title-main {
-            font-size: 52px;
-            font-weight: 700;
-            letter-spacing: 8px;
-            margin-bottom: 40px;
-            background: linear-gradient(135deg, 
-                rgba(120, 100, 255, 1),
-                rgba(80, 200, 255, 1),
-                rgba(200, 100, 255, 1)
-            );
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: textShimmer 3s linear infinite;
-            text-shadow: 0 0 40px rgba(120, 100, 255, 0.5);
-            transform: translateZ(50px) scale(0.9);
-        }
-
-        .status-text-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            transform-style: preserve-3d;
+            max-width: 900px;
         }
 
         .status-line {
-            font-size: 18px;
-            letter-spacing: 3px;
             color: rgba(255, 255, 255, 0.9);
             text-align: center;
-            transition: all 0.5s ease;
-            text-shadow: 0 0 20px rgba(120, 100, 255, 0.6);
-            opacity: 0;
-            animation: slideIn 0.6s ease-out forwards;
+            transition: all 0.4s ease;
+            letter-spacing: 1px;
         }
 
         .status-line:nth-child(1) {
-            font-size: 14px;
-            transform: translateZ(0px) scale(0.85);
-            opacity: 0.5;
-            animation-delay: 0s;
+            font-size: 12px;
+            opacity: 0.3;
         }
 
         .status-line:nth-child(2) {
-            font-size: 16px;
-            transform: translateZ(10px) scale(0.9);
-            opacity: 0.6;
-            animation-delay: 0.1s;
+            font-size: 14px;
+            opacity: 0.4;
         }
 
         .status-line:nth-child(3) {
-            font-size: 20px;
-            transform: translateZ(25px) scale(1);
-            opacity: 0.8;
-            animation-delay: 0.2s;
-            color: rgba(120, 200, 255, 1);
-            font-weight: 500;
+            font-size: 16px;
+            opacity: 0.6;
         }
 
         .status-line:nth-child(4) {
-            font-size: 24px;
-            transform: translateZ(40px) scale(1.1);
-            opacity: 1;
-            animation-delay: 0.3s;
-            background: linear-gradient(135deg, 
-                rgba(120, 100, 255, 1),
-                rgba(200, 100, 255, 1)
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 600;
+            font-size: 20px;
+            opacity: 0.8;
         }
 
         .status-line:nth-child(5) {
-            font-size: 28px;
-            transform: translateZ(60px) scale(1.2);
+            font-size: 26px;
             opacity: 1;
-            animation-delay: 0.4s;
-            background: linear-gradient(180deg, 
-                rgba(80, 200, 255, 1),
-                rgba(120, 100, 255, 1)
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-            text-shadow: 0 0 30px rgba(80, 200, 255, 0.8);
-        }
-
-        .file-info {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 14px;
-            letter-spacing: 2px;
-            opacity: 0.6;
-            color: rgba(255, 255, 255, 0.7);
-            font-family: 'Courier New', monospace;
-            animation: fadeIn 2s ease-out 1s both;
-        }
-
-        .server-name {
-            position: absolute;
-            top: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 16px;
-            letter-spacing: 3px;
-            opacity: 0.7;
-            color: rgba(255, 255, 255, 0.8);
-            text-shadow: 0 0 20px rgba(120, 100, 255, 0.5);
-            animation: fadeIn 1.5s ease-out both;
-        }
-
-        @keyframes bgMove {
-            0% { background-position: 0% 0%, 0 0; }
-            100% { background-position: 100% 100%, 100px 100px; }
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) translateX(0) scale(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) translateX(var(--tx)) scale(1);
-                opacity: 0;
-            }
-        }
-
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.5) rotate(-180deg);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 
-                    0 0 60px rgba(120, 100, 255, 0.3),
-                    inset 0 0 40px rgba(0, 0, 0, 0.4),
-                    0 20px 60px rgba(0, 0, 0, 0.6);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 
-                    0 0 80px rgba(120, 100, 255, 0.5),
-                    inset 0 0 40px rgba(0, 0, 0, 0.4),
-                    0 20px 80px rgba(0, 0, 0, 0.7);
-            }
-        }
-
-        @keyframes gradientRotate {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            font-weight: 600;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        @keyframes centerPulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-            50% {
-                transform: scale(1.3);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes textShimmer {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-50px) translateZ(var(--tz, 0)) scale(var(--scale, 1));
-                filter: blur(10px);
-            }
-            to {
-                opacity: var(--opacity, 1);
-                transform: translateX(0) translateZ(var(--tz, 0)) scale(var(--scale, 1));
-                filter: blur(0);
-            }
-        }
-
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-        }
-
-        .fade-out {
-            animation: fadeOut 1s ease-out forwards;
-        }
     </style>
 </head>
 <body>
-    <div class="background-layer"></div>
-    <div class="background-overlay"></div>
-    <div class="particles" id="particles"></div>
-
-    <div class="main-container">
-        <div class="server-name" id="serverName">Загрузка сервера...</div>
-
-        <div class="spinner-container">
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <div class="spinner-outer">
-                <div class="spinner-middle">
-                    <div class="spinner-center"></div>
-                </div>
-            </div>
+    <div class="container">
+        <div class="spinner"></div>
+        
+        <div class="text-wrapper" id="statusLines">
+            <div class="status-line">Подготовка...</div>
+            <div class="status-line">Подключение...</div>
+            <div class="status-line">Инициализация...</div>
+            <div class="status-line">Загрузка...</div>
+            <div class="status-line">Ожидание...</div>
         </div>
-
-        <div class="text-container">
-            <h1 class="title-main">ЗАГРУЗКА</h1>
-            <div class="status-text-wrapper" id="statusLines">
-                <div class="status-line">Подготовка...</div>
-                <div class="status-line">Подключение к серверу...</div>
-                <div class="status-line">Инициализация...</div>
-                <div class="status-line">Загрузка ресурсов...</div>
-                <div class="status-line">Ожидание...</div>
-            </div>
-        </div>
-
-        <div class="file-info" id="fileInfo">Загружено файлов: <span id="fileCount">0</span></div>
     </div>
 
     <script>
-        let currentStatus = 'Инициализация...';
         let statusHistory = ['Подготовка...', 'Подключение...', 'Инициализация...', 'Загрузка...', 'Ожидание...'];
-        let filesDownloaded = 0;
         let isGmodActive = false;
 
-        function createParticles() {
-            const container = document.getElementById('particles');
-            const count = 30;
-            
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    
-                    const size = Math.random() * 6 + 2;
-                    particle.style.width = size + 'px';
-                    particle.style.height = size + 'px';
-                    particle.style.left = Math.random() * 100 + '%';
-                    
-                    const duration = Math.random() * 10 + 15;
-                    const delay = Math.random() * 5;
-                    const tx = (Math.random() - 0.5) * 300;
-                    
-                    particle.style.setProperty('--tx', tx + 'px');
-                    particle.style.animation = `float ${duration}s linear ${delay}s infinite`;
-                    
-                    container.appendChild(particle);
-                }, i * 50);
-            }
-        }
-
-        function updateStatusDisplay(newStatus) {
-            currentStatus = newStatus;
+        function updateStatus(newStatus) {
             statusHistory.push(newStatus);
             if (statusHistory.length > 5) {
                 statusHistory.shift();
@@ -490,87 +114,71 @@
             const container = document.getElementById('statusLines');
             container.innerHTML = '';
             
-            statusHistory.forEach((status, index) => {
+            statusHistory.forEach((status) => {
                 const line = document.createElement('div');
                 line.className = 'status-line';
-                
-                const shortStatus = status.length > 50 ? status.substring(0, 47) + '...' : status;
-                line.textContent = shortStatus;
-                
+                line.textContent = status.length > 60 ? status.substring(0, 57) + '...' : status;
                 container.appendChild(line);
             });
         }
 
-        function updateFileCount(count) {
-            const fileCount = document.getElementById('fileCount');
-            if (fileCount) {
-                fileCount.textContent = count;
-            }
-        }
-
         const autoStatuses = [
             'Подключение к серверу...',
-            'Получение информации...',
-            'Синхронизация данных...',
+            'Получение данных...',
+            'Синхронизация...',
             'Загрузка карты...',
             'Загрузка моделей...',
             'Загрузка текстур...',
             'Загрузка звуков...',
-            'Подготовка игрового мира...',
-            'Инициализация системы...',
-            'Финальная подготовка...'
+            'Подготовка...',
+            'Инициализация...',
+            'Финализация...'
         ];
 
-        let autoStatusIndex = 0;
+        let autoIndex = 0;
 
-        function autoUpdateStatus() {
+        function autoUpdate() {
             if (!isGmodActive) {
-                updateStatusDisplay(autoStatuses[autoStatusIndex % autoStatuses.length]);
-                autoStatusIndex++;
+                updateStatus(autoStatuses[autoIndex % autoStatuses.length]);
+                autoIndex++;
             }
         }
 
-        // GMod API Functions
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
             isGmodActive = true;
-            const serverNameEl = document.getElementById('serverName');
-            if (servername && serverNameEl) {
-                serverNameEl.textContent = servername;
-            }
             if (mapname) {
-                updateStatusDisplay('Загрузка карты: ' + mapname);
+                updateStatus('Карта: ' + mapname);
             }
         }
 
         function SetStatusChanged(status) {
             isGmodActive = true;
             if (status) {
-                updateStatusDisplay(status);
+                updateStatus(status);
             }
         }
 
         function DownloadingFile(fileName) {
             isGmodActive = true;
             if (fileName) {
-                const shortName = fileName.length > 40 ? '...' + fileName.substring(fileName.length - 37) : fileName;
-                updateStatusDisplay('Загрузка: ' + shortName);
+                const shortName = fileName.length > 50 ? '...' + fileName.substring(fileName.length - 47) : fileName;
+                updateStatus('Загрузка: ' + shortName);
             }
         }
 
         function SetFilesNeeded(needed) {
             isGmodActive = true;
-            updateStatusDisplay('Необходимо файлов: ' + needed);
+            updateStatus('Необходимо файлов: ' + needed);
         }
 
         function SetFilesTotal(total) {
             isGmodActive = true;
-            updateStatusDisplay('Всего файлов: ' + total);
+            updateStatus('Всего файлов: ' + total);
         }
 
         function SetFilesDownloaded(downloaded) {
             isGmodActive = true;
-            filesDownloaded = downloaded;
-            updateFileCount(downloaded);
+            updateStatus('Загружено: ' + downloaded);
         }
 
         function SetLoadProgress(progress) {
@@ -579,7 +187,8 @@
             
             if (prog >= 100) {
                 setTimeout(() => {
-                    document.querySelector('.main-container').classList.add('fade-out');
+                    document.body.style.transition = 'opacity 1s';
+                    document.body.style.opacity = '0';
                     setTimeout(() => {
                         document.body.style.display = 'none';
                     }, 1000);
@@ -587,32 +196,11 @@
             }
         }
 
-        createParticles();
-
-        setInterval(autoUpdateStatus, 3500);
+        setInterval(autoUpdate, 3000);
 
         setTimeout(() => {
-            updateStatusDisplay('Подключение установлено');
+            updateStatus('Подключение установлено');
         }, 1000);
-
-        // Демо режим - раскомментируйте для теста
-        /*
-        let demoProgress = 0;
-        let demoFiles = 0;
-        setInterval(() => {
-            if (demoProgress < 100) {
-                demoProgress += Math.random() * 3;
-                demoFiles += Math.floor(Math.random() * 3);
-                SetFilesDownloaded(demoFiles);
-                SetLoadProgress(demoProgress);
-                
-                if (Math.random() > 0.6) {
-                    const testFiles = ['models/player.mdl', 'materials/concrete.vtf', 'sound/ambient.mp3', 'maps/gm_construct.bsp'];
-                    DownloadingFile(testFiles[Math.floor(Math.random() * testFiles.length)]);
-                }
-            }
-        }, 400);
-        */
     </script>
 </body>
 </html>
