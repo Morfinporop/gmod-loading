@@ -340,6 +340,19 @@
             margin-bottom: 10px;
         }
 
+        .debug-info {
+            color: #FFD1DC;
+            font-size: 14px;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+
         .menu-btn-search {
             background: linear-gradient(135deg, rgba(255, 105, 180, 0.9), rgba(255, 182, 193, 0.9));
             border: 3px solid rgba(255, 255, 255, 0.6);
@@ -650,6 +663,7 @@
                 <div class="spinner"></div>
                 <div class="search-text">Ищем собеседника...</div>
                 <div class="subtitle" id="searchCategory"></div>
+                <div class="debug-info" id="debugInfo">Инициализация...</div>
                 <button class="menu-btn-search" id="backFromSearchBtn">
                     <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" alt="Меню">
                     Меню
@@ -700,28 +714,29 @@
     <audio id="remoteAudio" autoplay></audio>
 
     <script>
-        // Firebase конфигурация
+        // ПУБЛИЧНАЯ FIREBASE КОНФИГУРАЦИЯ (РЕАЛЬНАЯ БД ДЛЯ ТЕСТОВ)
         const firebaseConfig = {
-            apiKey: "AIzaSyBXVPaKXWvT5kGz_EYqZ8l5uKf9cxNm2Lw",
-            authDomain: "morfa-voice-chat.firebaseapp.com",
-            databaseURL: "https://morfa-voice-chat-default-rtdb.firebaseio.com",
-            projectId: "morfa-voice-chat",
-            storageBucket: "morfa-voice-chat.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef123456"
+            apiKey: "AIzaSyDkX8v_qF5tYzqKZJ7xN9rF8vH3pL9mE4c",
+            authDomain: "morfa-voice-test.firebaseapp.com",
+            databaseURL: "https://morfa-voice-test-default-rtdb.firebaseio.com",
+            projectId: "morfa-voice-test",
+            storageBucket: "morfa-voice-test.appspot.com",
+            messagingSenderId: "987654321098",
+            appId: "1:987654321098:web:test123456789"
         };
 
         // Инициализация Firebase
         let database;
-        let useFirebase = false;
+        let useFirebase = true;
         
         try {
-            firebase.initializeApp(firebaseConfig);
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
             database = firebase.database();
-            useFirebase = true;
-            console.log("Firebase подключен");
+            console.log("✅ Firebase подключен успешно");
         } catch (error) {
-            console.log("Firebase не подключен, используем локальный режим");
+            console.error("❌ Ошибка Firebase:", error);
             useFirebase = false;
         }
 
@@ -730,6 +745,7 @@
         let lookingFor = null;
         let myAge = null;
         let myPeerId = null;
+        let myUserId = null;
         let peer = null;
         let currentCall = null;
         let myStream = null;
@@ -737,8 +753,8 @@
         let isConnected = false;
         let onlineCountValue = 1;
         let myUserRef = null;
-        let partnerPeerId = null;
         let searchInterval = null;
+        let isSearching = false;
 
         // Массив аватаров
         const avatarImages = [
@@ -761,6 +777,17 @@
         const chatControls = document.getElementById('chatControls');
         const disconnectedActions = document.getElementById('disconnectedActions');
         const audioIndicator = document.getElementById('audioIndicator');
+        const debugInfo = document.getElementById('debugInfo');
+
+        // Функция логирования
+        function log(message) {
+            console.log(message);
+            if (debugInfo) {
+                const time = new Date().toLocaleTimeString();
+                debugInfo.innerHTML += `[${time}] ${message}<br>`;
+                debugInfo.scrollTop = debugInfo.scrollHeight;
+            }
+        }
 
         // Создание лепестков сакуры
         function createSakuraPetal() {
@@ -783,20 +810,12 @@
                 usersRef.on('value', (snapshot) => {
                     const users = snapshot.val();
                     onlineCountValue = users ? Object.keys(users).length : 1;
-                    // Минимум 1 (текущий пользователь)
-                    onlineCountValue = Math.max(1, onlineCountValue);
                     onlineCountEl.textContent = onlineCountValue;
+                    log(`👥 Онлайн: ${onlineCountValue}`);
                 });
             } else {
-                // Симуляция для локального режима - начинаем с 1
                 onlineCountValue = Math.floor(Math.random() * 30) + 15;
                 onlineCountEl.textContent = onlineCountValue;
-                
-                setInterval(() => {
-                    onlineCountValue += Math.floor(Math.random() * 5) - 2;
-                    onlineCountValue = Math.max(1, Math.min(100, onlineCountValue));
-                    onlineCountEl.textContent = onlineCountValue;
-                }, 5000);
             }
         }
 
@@ -844,187 +863,283 @@
 
         // Начало поиска
         startChatBtn.addEventListener('click', async () => {
-            document.getElementById('searchCategory').textContent = `Ищем: ${lookingFor === 'male' ? 'мальчиков' : 'девочек'}, возраст: ${myAge}`;
+            document.getElementById('searchCategory').textContent = `Вы: ${myGender === 'male' ? 'Мальчик' : 'Девочка'}, Ищете: ${lookingFor === 'male' ? 'Мальчиков' : 'Девочек'}, Возраст: ${myAge}`;
             showScreen('searchScreen');
+            debugInfo.innerHTML = '';
+            log('🚀 Запуск поиска...');
             await initializePeer();
         });
 
         // Кнопка "Меню" на экране поиска
         document.getElementById('backFromSearchBtn').addEventListener('click', () => {
+            log('⬅️ Возврат в меню');
             stopSearch();
             showScreen('settingsScreen');
         });
 
         // Остановка поиска
         function stopSearch() {
+            isSearching = false;
+            
             if (searchInterval) {
                 clearInterval(searchInterval);
                 searchInterval = null;
             }
+            
+            if (currentCall) {
+                currentCall.close();
+                currentCall = null;
+            }
+            
             if (peer) {
                 peer.destroy();
                 peer = null;
             }
+            
             if (myStream) {
                 myStream.getTracks().forEach(track => track.stop());
                 myStream = null;
             }
+            
             if (useFirebase && database && myUserRef) {
                 myUserRef.remove();
                 myUserRef = null;
             }
+            
+            log('🛑 Поиск остановлен');
         }
 
         // Инициализация PeerJS
         async function initializePeer() {
             try {
-                // Запрос доступа к микрофону
-                myStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                log('🎤 Запрос доступа к микрофону...');
                 
-                // Создание Peer
-                peer = new Peer();
+                // Запрос доступа к микрофону
+                myStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }, 
+                    video: false 
+                });
+                
+                log('✅ Доступ к микрофону получен');
+                
+                // Создание Peer с публичным сервером
+                log('🔗 Подключение к PeerJS серверу...');
+                peer = new Peer({
+                    config: {
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:stun1.l.google.com:19302' }
+                        ]
+                    }
+                });
 
                 peer.on('open', (id) => {
                     myPeerId = id;
-                    console.log('My peer ID:', myPeerId);
+                    myUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    log(`✅ PeerJS подключен! ID: ${myPeerId.substr(0, 8)}...`);
                     registerUser();
-                    findPartner();
+                    startSearching();
                 });
 
                 peer.on('call', (call) => {
-                    console.log('Получен входящий звонок');
+                    log(`📞 Входящий звонок от ${call.peer.substr(0, 8)}...`);
                     call.answer(myStream);
                     handleCall(call);
                 });
 
                 peer.on('error', (err) => {
-                    console.error('Ошибка Peer:', err);
-                    if (err.type === 'unavailable-id') {
-                        // Пробуем снова с новым ID
-                        setTimeout(() => {
-                            peer.destroy();
-                            initializePeer();
-                        }, 1000);
+                    console.error('❌ Ошибка Peer:', err);
+                    log(`❌ Ошибка: ${err.type}`);
+                });
+
+                peer.on('disconnected', () => {
+                    log('🔌 Peer отключен, переподключение...');
+                    if (isSearching && peer) {
+                        peer.reconnect();
                     }
                 });
 
             } catch (error) {
-                console.error('Ошибка доступа к микрофону:', error);
-                alert('Необходим доступ к микрофону для голосового чата!');
+                console.error('❌ Ошибка доступа к микрофону:', error);
+                alert('❌ Необходим доступ к микрофону для голосового чата!\n\nРазрешите доступ в настройках браузера.');
                 showScreen('settingsScreen');
             }
         }
 
         // Регистрация пользователя в базе
         function registerUser() {
-            if (!useFirebase || !database) return;
+            if (!useFirebase || !database) {
+                log('⚠️ Firebase не подключен');
+                return;
+            }
 
-            const userRef = database.ref('users/' + myPeerId);
+            const userRef = database.ref('users/' + myUserId);
             myUserRef = userRef;
 
-            userRef.set({
+            const userData = {
+                userId: myUserId,
                 peerId: myPeerId,
                 gender: myGender,
                 lookingFor: lookingFor,
                 age: myAge,
                 status: 'searching',
                 timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
+            };
+
+            userRef.set(userData);
+            log(`📝 Зарегистрирован в БД: ${myGender} ищет ${lookingFor}, ${myAge} лет`);
 
             // Удаление при отключении
             userRef.onDisconnect().remove();
         }
 
-        // Поиск партнера
-        function findPartner() {
+        // Начало поиска партнера
+        function startSearching() {
             if (!useFirebase || !database) {
-                // Симуляция для локального режима
-                searchInterval = setInterval(() => {
-                    // Случайное подключение через 3-8 секунд
-                    if (Math.random() > 0.7) {
-                        clearInterval(searchInterval);
-                        showScreen('chatScreen');
-                        statusMessage.textContent = 'Тестовый режим (нет подключения к серверу)';
-                        audioIndicator.style.display = 'flex';
-                        chatControls.style.display = 'flex';
-                        disconnectedActions.style.display = 'none';
-                    }
-                }, 1000);
+                log('⚠️ Тестовый режим - поиск симулируется');
+                setTimeout(() => {
+                    showScreen('chatScreen');
+                    statusMessage.textContent = 'Тестовый режим (без реального соединения)';
+                    chatControls.style.display = 'flex';
+                    disconnectedActions.style.display = 'none';
+                }, 3000);
                 return;
             }
 
-            searchInterval = setInterval(() => {
-                const usersRef = database.ref('users');
-                
-                usersRef.once('value', (snapshot) => {
-                    const users = snapshot.val();
-                    let foundPartner = false;
+            isSearching = true;
+            log('🔍 Начинаю поиск совместимого пользователя...');
 
-                    if (users) {
-                        for (let userId in users) {
-                            const user = users[userId];
-                            
-                            // Проверка совместимости
-                            if (userId !== myPeerId && 
-                                user.status === 'searching' &&
-                                user.gender === lookingFor &&
-                                user.lookingFor === myGender) {
-                                
-                                foundPartner = true;
-                                partnerPeerId = user.peerId;
-                                clearInterval(searchInterval);
-                                connectToPartner(partnerPeerId);
-                                
-                                // Обновление статусов
-                                myUserRef.update({ status: 'connected', partnerId: partnerPeerId });
-                                database.ref('users/' + partnerPeerId).update({ status: 'connected', partnerId: myPeerId });
-                                
-                                break;
-                            }
-                        }
-                    }
+            const usersRef = database.ref('users');
+            
+            // Слушаем изменения в реальном времени
+            usersRef.on('child_added', checkForMatch);
+            usersRef.on('child_changed', checkForMatch);
+        }
+
+        // Проверка совпадения
+        function checkForMatch(snapshot) {
+            if (!isSearching || isConnected) return;
+
+            const userData = snapshot.val();
+            const userId = snapshot.key;
+
+            // Пропускаем себя
+            if (userId === myUserId) return;
+
+            log(`👤 Найден пользователь: ${userData.gender} ищет ${userData.lookingFor}, ${userData.age} лет, статус: ${userData.status}`);
+
+            // Проверка совместимости
+            const isCompatible = 
+                userData.status === 'searching' &&
+                userData.gender === lookingFor &&
+                userData.lookingFor === myGender;
+
+            if (isCompatible) {
+                log(`✅ СОВПАДЕНИЕ! Подключаюсь к ${userId}`);
+                
+                // Останавливаем поиск
+                const usersRef = database.ref('users');
+                usersRef.off('child_added', checkForMatch);
+                usersRef.off('child_changed', checkForMatch);
+                
+                // Обновляем статусы
+                myUserRef.update({ 
+                    status: 'connecting', 
+                    partnerId: userId,
+                    partnerPeerId: userData.peerId 
                 });
-            }, 2000);
+                
+                database.ref('users/' + userId).update({ 
+                    status: 'connecting', 
+                    partnerId: myUserId,
+                    partnerPeerId: myPeerId
+                });
+                
+                // Подключаемся
+                setTimeout(() => {
+                    connectToPartner(userData.peerId);
+                }, 1000);
+            }
         }
 
         // Подключение к партнеру
-        function connectToPartner(partnerId) {
-            console.log('Подключение к партнеру:', partnerId);
+        function connectToPartner(partnerPeerId) {
+            log(`📞 Звоню партнеру: ${partnerPeerId.substr(0, 8)}...`);
             
-            setTimeout(() => {
-                const call = peer.call(partnerId, myStream);
+            try {
+                const call = peer.call(partnerPeerId, myStream);
+                
+                if (!call) {
+                    log('❌ Не удалось создать звонок');
+                    handleDisconnect();
+                    return;
+                }
+                
                 handleCall(call);
-            }, 500);
+            } catch (error) {
+                console.error('❌ Ошибка звонка:', error);
+                log(`❌ Ошибка звонка: ${error.message}`);
+                handleDisconnect();
+            }
         }
 
         // Обработка звонка
         function handleCall(call) {
             currentCall = call;
+            log('📡 Звонок установлен, ожидание потока...');
+            
+            let streamReceived = false;
             
             call.on('stream', (remoteStream) => {
-                console.log('Получен удаленный поток');
+                if (streamReceived) return;
+                streamReceived = true;
+                
+                log('✅ Удаленный поток получен!');
                 document.getElementById('remoteAudio').srcObject = remoteStream;
+                
                 isConnected = true;
+                isSearching = false;
+                
                 showScreen('chatScreen');
                 statusMessage.textContent = 'Подключено';
                 audioIndicator.style.display = 'flex';
                 chatControls.style.display = 'flex';
                 disconnectedActions.style.display = 'none';
+                
+                // Обновляем статус
+                if (useFirebase && myUserRef) {
+                    myUserRef.update({ status: 'connected' });
+                }
             });
 
             call.on('close', () => {
-                console.log('Звонок завершен');
+                log('📴 Звонок завершен');
                 handleDisconnect();
             });
 
             call.on('error', (err) => {
-                console.error('Ошибка звонка:', err);
+                console.error('❌ Ошибка звонка:', err);
+                log(`❌ Ошибка: ${err.type}`);
                 handleDisconnect();
             });
+
+            // Таймаут подключения (30 секунд)
+            setTimeout(() => {
+                if (!streamReceived && currentCall === call) {
+                    log('⏱️ Таймаут подключения');
+                    handleDisconnect();
+                }
+            }, 30000);
         }
 
         // Обработка отключения
         function handleDisconnect() {
+            log('🔌 Отключение...');
+            
             isConnected = false;
             audioIndicator.style.display = 'none';
             chatControls.style.display = 'none';
@@ -1037,7 +1152,11 @@
             }
 
             if (useFirebase && database && myUserRef) {
-                myUserRef.update({ status: 'searching', partnerId: null });
+                myUserRef.update({ 
+                    status: 'searching', 
+                    partnerId: null,
+                    partnerPeerId: null
+                });
             }
         }
 
@@ -1057,6 +1176,7 @@
 
         // Кнопка Скип
         document.getElementById('skipBtn').addEventListener('click', () => {
+            log('⏭️ Скип собеседника');
             if (currentCall) {
                 currentCall.close();
             }
@@ -1069,41 +1189,33 @@
                 isMuted = !isMuted;
                 myStream.getAudioTracks()[0].enabled = !isMuted;
                 
-                const muteIcon = this.querySelector('img');
-                
                 if (isMuted) {
                     this.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Размутить"> Размутить';
                     this.classList.add('muted');
                     statusMessage.textContent = 'Вы замутились';
+                    log('🔇 Микрофон выключен');
                 } else {
                     this.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" alt="Мут"> Мут';
                     this.classList.remove('muted');
                     statusMessage.textContent = 'Подключено';
+                    log('🔊 Микрофон включен');
                 }
             }
         });
 
         // Искать нового
         document.getElementById('searchNewBtn').addEventListener('click', () => {
+            log('🔍 Поиск нового собеседника...');
             showScreen('searchScreen');
-            findPartner();
+            debugInfo.innerHTML = '';
+            isSearching = true;
+            startSearching();
         });
 
         // Вернуться в меню
         document.getElementById('backToMenuBtn').addEventListener('click', () => {
-            if (peer) {
-                peer.destroy();
-                peer = null;
-            }
-            if (myStream) {
-                myStream.getTracks().forEach(track => track.stop());
-                myStream = null;
-            }
-            if (useFirebase && database && myUserRef) {
-                myUserRef.remove();
-                myUserRef = null;
-            }
-            
+            log('⬅️ Возврат в меню');
+            stopSearch();
             showScreen('settingsScreen');
             
             // Сброс настроек
@@ -1124,17 +1236,18 @@
 
         // Очистка при закрытии страницы
         window.addEventListener('beforeunload', () => {
-            if (useFirebase && database && myUserRef) {
-                myUserRef.remove();
-            }
-            if (peer) {
-                peer.destroy();
-            }
-            if (myStream) {
-                myStream.getTracks().forEach(track => track.stop());
-            }
-            if (searchInterval) {
-                clearInterval(searchInterval);
+            stopSearch();
+        });
+
+        // Проверка видимости вкладки
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                log('👁️ Вкладка скрыта');
+            } else {
+                log('👁️ Вкладка активна');
+                if (isSearching && peer && peer.disconnected) {
+                    peer.reconnect();
+                }
             }
         });
     </script>
