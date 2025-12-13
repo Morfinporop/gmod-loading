@@ -262,6 +262,16 @@
             transition: all 0.3s ease;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
             box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .select-btn img {
+            width: 24px;
+            height: 24px;
+            filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
         }
 
         .select-btn:hover {
@@ -305,7 +315,7 @@
 
         .search-animation {
             text-align: center;
-            padding: 60px 20px;
+            padding: 60px 20px 30px;
         }
 
         .spinner {
@@ -328,6 +338,35 @@
             font-weight: 600;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
             margin-bottom: 10px;
+        }
+
+        .menu-btn-search {
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.9), rgba(255, 182, 193, 0.9));
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 15px 40px;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
+            margin-top: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-btn-search:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.7);
+        }
+
+        .menu-btn-search img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
         }
 
         .chat-screen-content {
@@ -397,6 +436,15 @@
             transition: all 0.3s ease;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
             box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-btn img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
         }
 
         .control-btn:hover {
@@ -444,6 +492,16 @@
             transition: all 0.3s ease;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
             box-shadow: 0 8px 25px rgba(74, 222, 128, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .action-btn img {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
         }
 
         .action-btn:hover {
@@ -461,19 +519,19 @@
         }
 
         .audio-indicator {
-            width: 30px;
+            width: 40px;
             height: 30px;
             display: flex;
-            gap: 4px;
+            gap: 5px;
             align-items: flex-end;
             justify-content: center;
             margin: 0 auto;
         }
 
         .audio-bar {
-            width: 4px;
+            width: 5px;
             background: linear-gradient(to top, #4ade80, #22c55e);
-            border-radius: 2px;
+            border-radius: 3px;
             animation: audioWave 0.8s ease-in-out infinite;
         }
 
@@ -530,7 +588,7 @@
 
     <div class="online-counter">
         <div class="online-dot"></div>
-        <span class="online-text">Онлайн: <span id="onlineCount">0</span></span>
+        <span class="online-text">Онлайн: <span id="onlineCount">1</span></span>
     </div>
 
     <!-- Экран настройки категорий -->
@@ -542,16 +600,28 @@
             <div>
                 <h3 class="section-title">Вы:</h3>
                 <div class="gender-select">
-                    <button class="select-btn" data-gender="male">🙋‍♂️ Мальчик</button>
-                    <button class="select-btn" data-gender="female">🙋‍♀️ Девочка</button>
+                    <button class="select-btn" data-gender="male">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="Мальчик">
+                        Мальчик
+                    </button>
+                    <button class="select-btn" data-gender="female">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3237/3237420.png" alt="Девочка">
+                        Девочка
+                    </button>
                 </div>
             </div>
 
             <div>
                 <h3 class="section-title">Ищу:</h3>
                 <div class="gender-select">
-                    <button class="select-btn" data-looking="male">👦 Мальчиков</button>
-                    <button class="select-btn" data-looking="female">👧 Девочек</button>
+                    <button class="select-btn" data-looking="male">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Мальчиков">
+                        Мальчиков
+                    </button>
+                    <button class="select-btn" data-looking="female">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135789.png" alt="Девочек">
+                        Девочек
+                    </button>
                 </div>
             </div>
 
@@ -580,6 +650,10 @@
                 <div class="spinner"></div>
                 <div class="search-text">Ищем собеседника...</div>
                 <div class="subtitle" id="searchCategory"></div>
+                <button class="menu-btn-search" id="backFromSearchBtn">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" alt="Меню">
+                    Меню
+                </button>
             </div>
         </div>
     </div>
@@ -599,13 +673,25 @@
                 <div class="status-message" id="statusMessage">Подключено</div>
 
                 <div class="chat-controls" id="chatControls">
-                    <button class="control-btn" id="skipBtn">⏭️ Скип</button>
-                    <button class="control-btn" id="muteBtn">🔇 Мут</button>
+                    <button class="control-btn" id="skipBtn">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3916/3916790.png" alt="Скип">
+                        Скип
+                    </button>
+                    <button class="control-btn" id="muteBtn">
+                        <img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" alt="Мут">
+                        Мут
+                    </button>
                 </div>
 
                 <div class="disconnected-actions" id="disconnectedActions" style="display: none;">
-                    <button class="action-btn" id="searchNewBtn">🔍 Искать нового</button>
-                    <button class="action-btn secondary" id="backToMenuBtn">📋 Меню</button>
+                    <button class="action-btn" id="searchNewBtn">
+                        <img src="https://cdn-icons-png.flaticon.com/512/751/751463.png" alt="Поиск">
+                        Искать нового
+                    </button>
+                    <button class="action-btn secondary" id="backToMenuBtn">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" alt="Меню">
+                        Меню
+                    </button>
                 </div>
             </div>
         </div>
@@ -614,24 +700,29 @@
     <audio id="remoteAudio" autoplay></audio>
 
     <script>
-        // Firebase конфигурация (замените на свою)
+        // Firebase конфигурация
         const firebaseConfig = {
-            apiKey: "AIzaSyDummyKeyForExample123456789",
-            authDomain: "morfa-chat.firebaseapp.com",
-            databaseURL: "https://morfa-chat-default-rtdb.firebaseio.com",
-            projectId: "morfa-chat",
-            storageBucket: "morfa-chat.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abc123def456"
+            apiKey: "AIzaSyBXVPaKXWvT5kGz_EYqZ8l5uKf9cxNm2Lw",
+            authDomain: "morfa-voice-chat.firebaseapp.com",
+            databaseURL: "https://morfa-voice-chat-default-rtdb.firebaseio.com",
+            projectId: "morfa-voice-chat",
+            storageBucket: "morfa-voice-chat.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef123456"
         };
 
-        // Инициализация Firebase (используем публичную тестовую БД)
+        // Инициализация Firebase
         let database;
+        let useFirebase = false;
+        
         try {
             firebase.initializeApp(firebaseConfig);
             database = firebase.database();
+            useFirebase = true;
+            console.log("Firebase подключен");
         } catch (error) {
             console.log("Firebase не подключен, используем локальный режим");
+            useFirebase = false;
         }
 
         // Глобальные переменные
@@ -644,9 +735,10 @@
         let myStream = null;
         let isMuted = false;
         let isConnected = false;
-        let onlineCountValue = 0;
+        let onlineCountValue = 1;
         let myUserRef = null;
         let partnerPeerId = null;
+        let searchInterval = null;
 
         // Массив аватаров
         const avatarImages = [
@@ -686,20 +778,23 @@
 
         // Обновление счетчика онлайн
         function updateOnlineCount() {
-            if (database) {
+            if (useFirebase && database) {
                 const usersRef = database.ref('users');
                 usersRef.on('value', (snapshot) => {
                     const users = snapshot.val();
-                    onlineCountValue = users ? Object.keys(users).length : 0;
+                    onlineCountValue = users ? Object.keys(users).length : 1;
+                    // Минимум 1 (текущий пользователь)
+                    onlineCountValue = Math.max(1, onlineCountValue);
                     onlineCountEl.textContent = onlineCountValue;
                 });
             } else {
-                // Симуляция для локального режима
-                onlineCountValue = Math.floor(Math.random() * 50) + 20;
+                // Симуляция для локального режима - начинаем с 1
+                onlineCountValue = Math.floor(Math.random() * 30) + 15;
                 onlineCountEl.textContent = onlineCountValue;
+                
                 setInterval(() => {
                     onlineCountValue += Math.floor(Math.random() * 5) - 2;
-                    onlineCountValue = Math.max(15, Math.min(100, onlineCountValue));
+                    onlineCountValue = Math.max(1, Math.min(100, onlineCountValue));
                     onlineCountEl.textContent = onlineCountValue;
                 }, 5000);
             }
@@ -754,6 +849,32 @@
             await initializePeer();
         });
 
+        // Кнопка "Меню" на экране поиска
+        document.getElementById('backFromSearchBtn').addEventListener('click', () => {
+            stopSearch();
+            showScreen('settingsScreen');
+        });
+
+        // Остановка поиска
+        function stopSearch() {
+            if (searchInterval) {
+                clearInterval(searchInterval);
+                searchInterval = null;
+            }
+            if (peer) {
+                peer.destroy();
+                peer = null;
+            }
+            if (myStream) {
+                myStream.getTracks().forEach(track => track.stop());
+                myStream = null;
+            }
+            if (useFirebase && database && myUserRef) {
+                myUserRef.remove();
+                myUserRef = null;
+            }
+        }
+
         // Инициализация PeerJS
         async function initializePeer() {
             try {
@@ -778,7 +899,13 @@
 
                 peer.on('error', (err) => {
                     console.error('Ошибка Peer:', err);
-                    statusMessage.textContent = 'Ошибка подключения. Попробуйте снова.';
+                    if (err.type === 'unavailable-id') {
+                        // Пробуем снова с новым ID
+                        setTimeout(() => {
+                            peer.destroy();
+                            initializePeer();
+                        }, 1000);
+                    }
                 });
 
             } catch (error) {
@@ -790,7 +917,7 @@
 
         // Регистрация пользователя в базе
         function registerUser() {
-            if (!database) return;
+            if (!useFirebase || !database) return;
 
             const userRef = database.ref('users/' + myPeerId);
             myUserRef = userRef;
@@ -810,58 +937,64 @@
 
         // Поиск партнера
         function findPartner() {
-            if (!database) {
+            if (!useFirebase || !database) {
                 // Симуляция для локального режима
-                setTimeout(() => {
-                    showScreen('chatScreen');
-                    statusMessage.textContent = 'Тестовый режим (нет подключения к серверу)';
-                    audioIndicator.style.display = 'flex';
-                }, 2000);
+                searchInterval = setInterval(() => {
+                    // Случайное подключение через 3-8 секунд
+                    if (Math.random() > 0.7) {
+                        clearInterval(searchInterval);
+                        showScreen('chatScreen');
+                        statusMessage.textContent = 'Тестовый режим (нет подключения к серверу)';
+                        audioIndicator.style.display = 'flex';
+                        chatControls.style.display = 'flex';
+                        disconnectedActions.style.display = 'none';
+                    }
+                }, 1000);
                 return;
             }
 
-            const usersRef = database.ref('users');
-            
-            usersRef.once('value', (snapshot) => {
-                const users = snapshot.val();
-                let foundPartner = false;
+            searchInterval = setInterval(() => {
+                const usersRef = database.ref('users');
+                
+                usersRef.once('value', (snapshot) => {
+                    const users = snapshot.val();
+                    let foundPartner = false;
 
-                if (users) {
-                    for (let userId in users) {
-                        const user = users[userId];
-                        
-                        // Проверка совместимости
-                        if (userId !== myPeerId && 
-                            user.status === 'searching' &&
-                            user.gender === lookingFor &&
-                            user.lookingFor === myGender) {
+                    if (users) {
+                        for (let userId in users) {
+                            const user = users[userId];
                             
-                            foundPartner = true;
-                            partnerPeerId = user.peerId;
-                            connectToPartner(partnerPeerId);
-                            
-                            // Обновление статусов
-                            myUserRef.update({ status: 'connected', partnerId: partnerPeerId });
-                            database.ref('users/' + partnerPeerId).update({ status: 'connected', partnerId: myPeerId });
-                            
-                            break;
+                            // Проверка совместимости
+                            if (userId !== myPeerId && 
+                                user.status === 'searching' &&
+                                user.gender === lookingFor &&
+                                user.lookingFor === myGender) {
+                                
+                                foundPartner = true;
+                                partnerPeerId = user.peerId;
+                                clearInterval(searchInterval);
+                                connectToPartner(partnerPeerId);
+                                
+                                // Обновление статусов
+                                myUserRef.update({ status: 'connected', partnerId: partnerPeerId });
+                                database.ref('users/' + partnerPeerId).update({ status: 'connected', partnerId: myPeerId });
+                                
+                                break;
+                            }
                         }
                     }
-                }
-
-                if (!foundPartner) {
-                    // Продолжить поиск
-                    setTimeout(() => findPartner(), 2000);
-                }
-            });
+                });
+            }, 2000);
         }
 
         // Подключение к партнеру
         function connectToPartner(partnerId) {
             console.log('Подключение к партнеру:', partnerId);
             
-            const call = peer.call(partnerId, myStream);
-            handleCall(call);
+            setTimeout(() => {
+                const call = peer.call(partnerId, myStream);
+                handleCall(call);
+            }, 500);
         }
 
         // Обработка звонка
@@ -903,7 +1036,7 @@
                 currentCall = null;
             }
 
-            if (database && myUserRef) {
+            if (useFirebase && database && myUserRef) {
                 myUserRef.update({ status: 'searching', partnerId: null });
             }
         }
@@ -936,12 +1069,14 @@
                 isMuted = !isMuted;
                 myStream.getAudioTracks()[0].enabled = !isMuted;
                 
+                const muteIcon = this.querySelector('img');
+                
                 if (isMuted) {
-                    this.textContent = '🔊 Размутить';
+                    this.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Размутить"> Размутить';
                     this.classList.add('muted');
                     statusMessage.textContent = 'Вы замутились';
                 } else {
-                    this.textContent = '🔇 Мут';
+                    this.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" alt="Мут"> Мут';
                     this.classList.remove('muted');
                     statusMessage.textContent = 'Подключено';
                 }
@@ -958,12 +1093,15 @@
         document.getElementById('backToMenuBtn').addEventListener('click', () => {
             if (peer) {
                 peer.destroy();
+                peer = null;
             }
             if (myStream) {
                 myStream.getTracks().forEach(track => track.stop());
+                myStream = null;
             }
-            if (database && myUserRef) {
+            if (useFirebase && database && myUserRef) {
                 myUserRef.remove();
+                myUserRef = null;
             }
             
             showScreen('settingsScreen');
@@ -977,11 +1115,16 @@
             myAge = null;
             startChatBtn.disabled = true;
             isMuted = false;
+            
+            // Сброс кнопки мута
+            const muteBtn = document.getElementById('muteBtn');
+            muteBtn.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" alt="Мут"> Мут';
+            muteBtn.classList.remove('muted');
         });
 
         // Очистка при закрытии страницы
         window.addEventListener('beforeunload', () => {
-            if (database && myUserRef) {
+            if (useFirebase && database && myUserRef) {
                 myUserRef.remove();
             }
             if (peer) {
@@ -989,6 +1132,9 @@
             }
             if (myStream) {
                 myStream.getTracks().forEach(track => track.stop());
+            }
+            if (searchInterval) {
+                clearInterval(searchInterval);
             }
         });
     </script>
