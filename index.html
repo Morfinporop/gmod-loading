@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lost Underground - Загрузка</title>
+    <title>MORFA Voice Chat - Анонимный голосовой чат</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,735 +16,981 @@
             box-sizing: border-box;
         }
 
-        html, body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: rgb(11, 11, 11);
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            color: white;
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-image: url('https://textur.gas-kvas.com/uploads/posts/2024-10/textur-gas-kvas-com-cx7g-p-teksturi-lepestki-sakuri-10.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
+            overflow-x: hidden;
         }
 
-        .background-layer {
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(30, 0, 50, 0.5) 100%);
+            backdrop-filter: blur(3px);
+            z-index: 0;
+        }
+
+        .animated-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
+            pointer-events: none;
         }
 
-        .bg-image-container {
+        .wave {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+            width: 200%;
             height: 100%;
-            z-index: 1;
+            background: linear-gradient(90deg, transparent, rgba(255, 182, 193, 0.1), transparent);
+            animation: wave 15s linear infinite;
         }
 
-        .bg-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0;
-            transition: opacity 3s ease-in-out;
-        }
-
-        .bg-image.active {
-            opacity: 0.4;
-        }
-
-        .bg-overlay-dark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                135deg,
-                rgba(11, 11, 11, 0.85) 0%,
-                rgba(25, 25, 25, 0.75) 50%,
-                rgba(11, 11, 11, 0.85) 100%
-            );
-            z-index: 2;
-        }
-
-        .bg-overlay-gradient {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(
-                ellipse at center,
-                rgba(25, 25, 25, 0.3) 0%,
-                rgba(11, 11, 11, 0.8) 70%,
-                rgb(11, 11, 11) 100%
-            );
-            z-index: 3;
-            animation: gradientPulse 8s ease-in-out infinite;
-        }
-
-        .grid-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-            background-size: 60px 60px;
-            z-index: 4;
+        .wave:nth-child(2) {
+            animation-delay: -5s;
             opacity: 0.5;
-            pointer-events: none;
         }
 
-        .vignette {
+        .wave:nth-child(3) {
+            animation-delay: -10s;
+            opacity: 0.3;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0%); }
+        }
+
+        .sakura-petal {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            box-shadow: inset 0 0 200px rgba(0, 0, 0, 0.8);
-            z-index: 5;
+            width: 15px;
+            height: 15px;
             pointer-events: none;
-        }
-
-        .main-content {
-            position: relative;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-            padding: 40px;
-        }
-
-        .spinner-wrapper {
-            position: relative;
-            margin-bottom: 50px;
-            animation: fadeInScale 1.5s ease-out forwards;
-            transform: translateY(-40px);
-        }
-
-        .spinner-glow {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(
-                circle,
-                rgba(255, 255, 255, 0.15) 0%,
-                transparent 70%
-            );
-            border-radius: 50%;
-            animation: glowPulse 3s ease-in-out infinite;
             z-index: 1;
+            top: -50px;
         }
 
-        .spinner-outer {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            border: 3px solid rgba(255, 255, 255, 0.05);
-            border-top: 3px solid rgba(255, 255, 255, 0.8);
-            border-right: 3px solid rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            animation: spinRotate 2s linear infinite;
-            z-index: 2;
-            background: rgba(25, 25, 25, 0.4);
-            box-shadow: 
-                0 0 30px rgba(0, 0, 0, 0.5),
-                inset 0 0 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .spinner-middle {
+        .sakura-petal::before {
+            content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 130px;
-            height: 130px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            background: rgba(11, 11, 11, 0.6);
-            box-shadow: 
-                inset 0 0 30px rgba(0, 0, 0, 0.8),
-                0 0 20px rgba(255, 255, 255, 0.1);
-            z-index: 3;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle at 30% 30%, #FFE5EC, #FFB7C5);
+            border-radius: 50% 0 50% 0;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
         }
 
-        .spinner-inner {
+        .sakura-petal::after {
+            content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: rgba(25, 25, 25, 0.8);
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle at 70% 30%, #FFC1D5, #FF9EBF);
+            border-radius: 0 50% 0 50%;
+            transform: rotate(-45deg) translateX(3px);
+            box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
+        }
+
+        @keyframes sakura-fall {
+            0% {
+                transform: translateY(0) rotate(0deg) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg) translateX(100px);
+                opacity: 0.3;
+            }
+        }
+
+        .online-counter {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1000;
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.95), rgba(255, 182, 193, 0.95));
+            backdrop-filter: blur(20px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px;
+            padding: 15px 25px;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3);
             display: flex;
-            justify-content: center;
             align-items: center;
-            overflow: hidden;
-            box-shadow: 
-                inset 0 0 20px rgba(0, 0, 0, 0.9),
-                0 0 15px rgba(255, 255, 255, 0.15);
-            z-index: 4;
+            gap: 12px;
+            animation: pulse-counter 2s ease-in-out infinite;
         }
 
-        .logo-image {
-            width: 90px;
-            height: 90px;
+        @keyframes pulse-counter {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(255, 105, 180, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 10px 45px rgba(255, 105, 180, 0.8), inset 0 2px 0 rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        .online-dot {
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            object-fit: cover;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-            animation: logoFloat 4s ease-in-out infinite;
+            background: #4ade80;
+            animation: blink 2s infinite;
+            box-shadow: 0 0 15px #4ade80;
         }
 
-        .spinner-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 165px;
-            height: 165px;
-            border: 2px solid transparent;
-            border-top: 2px solid rgba(255, 255, 255, 0.3);
-            border-left: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            animation: spinRotateReverse 3s linear infinite;
-            z-index: 1;
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
-        .title-section {
-            text-align: center;
-            margin-bottom: 60px;
-            animation: fadeInUp 1.2s ease-out 0.3s both;
-        }
-
-        .main-title {
-            font-size: 56px;
+        .online-text {
+            color: white;
             font-weight: 700;
-            color: white;
-            letter-spacing: 6px;
-            margin-bottom: 12px;
-            text-shadow: 
-                0 0 20px rgba(255, 255, 255, 0.3),
-                0 4px 10px rgba(0, 0, 0, 0.8);
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 1) 0%,
-                rgba(200, 200, 200, 1) 100%
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 18px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
         }
 
-        .subtitle {
-            font-size: 20px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
-            letter-spacing: 3px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        .screen {
+            display: none;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
         }
 
-        .status-container {
-            width: 90%;
-            max-width: 1000px;
+        .screen.active {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 18px;
-            padding: 30px;
-            background: linear-gradient(
-                145deg,
-                rgba(25, 25, 25, 0.3) 0%,
-                rgba(11, 11, 11, 0.5) 100%
-            );
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 
-                0 10px 50px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.03);
-            animation: fadeInUp 1.5s ease-out 0.6s both;
-        }
-
-        .status-line {
-            color: white;
-            text-align: center;
-            transition: all 0.5s ease;
-            letter-spacing: 1.5px;
-            line-height: 1.4;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            animation: statusSlideIn 0.6s ease-out forwards;
-            word-wrap: break-word;
-            max-width: 100%;
-        }
-
-        .status-line:nth-child(1) {
-            font-size: 13px;
-            opacity: 0.35;
-            font-weight: 300;
-            animation-delay: 0s;
-        }
-
-        .status-line:nth-child(2) {
-            font-size: 15px;
-            opacity: 0.45;
-            font-weight: 300;
-            animation-delay: 0.1s;
-        }
-
-        .status-line:nth-child(3) {
-            font-size: 18px;
-            opacity: 0.65;
-            font-weight: 400;
-            animation-delay: 0.2s;
-        }
-
-        .status-line:nth-child(4) {
-            font-size: 22px;
-            opacity: 0.85;
-            font-weight: 500;
-            animation-delay: 0.3s;
-        }
-
-        .status-line:nth-child(5) {
-            font-size: 28px;
-            opacity: 1;
-            font-weight: 600;
-            animation-delay: 0.4s;
-            text-shadow: 
-                0 0 15px rgba(255, 255, 255, 0.4),
-                0 4px 10px rgba(0, 0, 0, 0.8);
-        }
-
-        @keyframes gradientPulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.8;
-            }
-        }
-
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: translateY(-40px) scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(-40px) scale(1);
-            }
-        }
-
-        @keyframes spinRotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes spinRotateReverse {
-            0% {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-            100% {
-                transform: translate(-50%, -50%) rotate(-360deg);
-            }
-        }
-
-        @keyframes glowPulse {
-            0%, 100% {
-                opacity: 0.5;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            50% {
-                opacity: 0.8;
-                transform: translate(-50%, -50%) scale(1.1);
-            }
-        }
-
-        @keyframes logoFloat {
-            0%, 100% {
-                transform: translateY(0) scale(1);
-            }
-            50% {
-                transform: translateY(-3px) scale(1.05);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes statusSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-                filter: blur(5px);
-            }
-            to {
-                opacity: var(--final-opacity, 1);
-                transform: translateX(0);
-                filter: blur(0);
-            }
+            animation: fadeIn 0.5s ease;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
+                transform: scale(0.95);
             }
             to {
                 opacity: 1;
+                transform: scale(1);
             }
         }
 
-        @keyframes fadeOutAll {
-            to {
-                opacity: 0;
-                transform: scale(0.95);
+        .main-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 182, 193, 0.1) 100%);
+            backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 35px;
+            padding: 50px 40px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 105, 180, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            width: 100%;
+        }
+
+        .title {
+            text-align: center;
+            color: #fff;
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255, 105, 180, 0.8), 3px 3px 10px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 182, 193, 0.6);
+            letter-spacing: 4px;
+            animation: title-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes title-glow {
+            0%, 100% {
+                text-shadow: 0 0 20px rgba(255, 105, 180, 0.8), 3px 3px 10px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 182, 193, 0.6);
+            }
+            50% {
+                text-shadow: 0 0 30px rgba(255, 105, 180, 1), 3px 3px 15px rgba(0, 0, 0, 0.9), 0 0 60px rgba(255, 182, 193, 0.9);
             }
         }
 
-        .fade-out {
-            animation: fadeOutAll 1.2s ease-out forwards;
+        .subtitle {
+            text-align: center;
+            color: #FFD1DC;
+            font-size: 18px;
+            margin-bottom: 30px;
+            font-weight: 400;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        .gender-select, .age-select {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .age-select {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .select-btn {
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.7), rgba(255, 182, 193, 0.7));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 18px;
+            padding: 15px 20px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .select-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.5);
+        }
+
+        .select-btn.selected {
+            background: linear-gradient(135deg, #ff1493, #ff69b4);
+            border-color: white;
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.6);
+        }
+
+        .start-chat-btn {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px;
+            padding: 18px 50px;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(74, 222, 128, 0.5);
+            display: block;
+            margin: 30px auto 0;
+            width: 100%;
+        }
+
+        .start-chat-btn:hover:not(:disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(74, 222, 128, 0.7);
+        }
+
+        .start-chat-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .search-animation {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 6px solid rgba(255, 105, 180, 0.3);
+            border-top-color: #ff69b4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .search-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .chat-screen-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            padding: 40px 20px;
+        }
+
+        .avatar-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 5px solid rgba(255, 182, 193, 0.8);
+            background-size: cover;
+            background-position: center;
+            background-image: url('https://i.pinimg.com/originals/a0/25/0d/a0250d4548856dd49e3724f1d637e45b.jpg');
+            box-shadow: 0 15px 40px rgba(255, 105, 180, 0.6), 0 0 60px rgba(255, 105, 180, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .avatar-circle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 105, 180, 0.2));
+            border-radius: 50%;
+        }
+
+        .avatar-circle:hover {
+            transform: scale(1.08) rotate(5deg);
+            box-shadow: 0 20px 50px rgba(255, 105, 180, 0.8);
+        }
+
+        .avatar-circle.switching {
+            animation: switchAvatar 0.6s ease-in-out;
+        }
+
+        @keyframes switchAvatar {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(0.7) rotate(180deg); opacity: 0.3; }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+
+        .chat-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.9), rgba(255, 182, 193, 0.9));
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 15px 30px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.7);
+        }
+
+        .control-btn.muted {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .status-message {
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255, 105, 180, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .disconnected-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 18px 30px;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.5);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(74, 222, 128, 0.7);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
+        }
+
+        .action-btn.secondary:hover {
+            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.7);
+        }
+
+        .audio-indicator {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .audio-bar {
+            width: 4px;
+            background: linear-gradient(to top, #4ade80, #22c55e);
+            border-radius: 2px;
+            animation: audioWave 0.8s ease-in-out infinite;
+        }
+
+        .audio-bar:nth-child(1) { height: 10px; animation-delay: 0s; }
+        .audio-bar:nth-child(2) { height: 20px; animation-delay: 0.2s; }
+        .audio-bar:nth-child(3) { height: 15px; animation-delay: 0.4s; }
+
+        @keyframes audioWave {
+            0%, 100% { transform: scaleY(0.5); }
+            50% { transform: scaleY(1.5); }
         }
 
         @media (max-width: 768px) {
-            .main-title {
-                font-size: 38px;
-                letter-spacing: 4px;
+            .online-counter {
+                top: 15px;
+                left: 15px;
+                padding: 10px 15px;
             }
 
-            .subtitle {
-                font-size: 16px;
+            .title {
+                font-size: 32px;
             }
 
-            .spinner-outer {
-                width: 120px;
-                height: 120px;
+            .main-card {
+                padding: 35px 25px;
             }
 
-            .spinner-middle {
-                width: 100px;
-                height: 100px;
+            .avatar-circle {
+                width: 160px;
+                height: 160px;
             }
 
-            .spinner-inner {
-                width: 75px;
-                height: 75px;
+            .chat-controls {
+                flex-direction: column;
+                width: 100%;
             }
 
-            .logo-image {
-                width: 65px;
-                height: 65px;
+            .control-btn {
+                width: 100%;
             }
 
-            .status-line:nth-child(1) { font-size: 11px; }
-            .status-line:nth-child(2) { font-size: 13px; }
-            .status-line:nth-child(3) { font-size: 15px; }
-            .status-line:nth-child(4) { font-size: 18px; }
-            .status-line:nth-child(5) { font-size: 22px; }
+            .age-select {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="background-layer">
-        <div class="bg-image-container">
-            <div class="bg-image" id="bgImage1"></div>
-            <div class="bg-image" id="bgImage2"></div>
-            <div class="bg-image" id="bgImage3"></div>
-        </div>
-        <div class="bg-overlay-dark"></div>
-        <div class="bg-overlay-gradient"></div>
-        <div class="grid-pattern"></div>
-        <div class="vignette"></div>
+    <div class="animated-bg">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
     </div>
 
-    <div class="main-content">
-        <div class="spinner-wrapper">
-            <div class="spinner-glow"></div>
-            <div class="spinner-ring"></div>
-            <div class="spinner-outer">
-                <div class="spinner-middle">
-                    <div class="spinner-inner">
-                        <img src="https://cdn.discordapp.com/attachments/1373657384798388265/1442422579607633921/1mb.png?ex=69256035&is=69240eb5&hm=c54cd16adc755b9512aa9503530b68071f5f450321b084f10e2fefc266443829&" 
-                             alt="Logo" 
-                             class="logo-image"
-                             onerror="this.style.display='none'">
-                    </div>
+    <div class="online-counter">
+        <div class="online-dot"></div>
+        <span class="online-text">Онлайн: <span id="onlineCount">0</span></span>
+    </div>
+
+    <!-- Экран настройки категорий -->
+    <div class="screen active" id="settingsScreen">
+        <div class="main-card">
+            <h1 class="title">MORFA VOICE</h1>
+            <p class="subtitle">Анонимный голосовой чат</p>
+            
+            <div>
+                <h3 class="section-title">Вы:</h3>
+                <div class="gender-select">
+                    <button class="select-btn" data-gender="male">🙋‍♂️ Мальчик</button>
+                    <button class="select-btn" data-gender="female">🙋‍♀️ Девочка</button>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="section-title">Ищу:</h3>
+                <div class="gender-select">
+                    <button class="select-btn" data-looking="male">👦 Мальчиков</button>
+                    <button class="select-btn" data-looking="female">👧 Девочек</button>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="section-title">Ваш возраст:</h3>
+                <div class="age-select">
+                    <button class="select-btn" data-age="10">10</button>
+                    <button class="select-btn" data-age="11">11</button>
+                    <button class="select-btn" data-age="12">12</button>
+                    <button class="select-btn" data-age="13">13</button>
+                    <button class="select-btn" data-age="14">14</button>
+                    <button class="select-btn" data-age="15">15</button>
+                    <button class="select-btn" data-age="16">16</button>
+                    <button class="select-btn" data-age="16+">16+</button>
+                </div>
+            </div>
+
+            <button class="start-chat-btn" id="startChatBtn" disabled>Начать чат</button>
+        </div>
+    </div>
+
+    <!-- Экран поиска -->
+    <div class="screen" id="searchScreen">
+        <div class="main-card">
+            <div class="search-animation">
+                <div class="spinner"></div>
+                <div class="search-text">Ищем собеседника...</div>
+                <div class="subtitle" id="searchCategory"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран чата -->
+    <div class="screen" id="chatScreen">
+        <div class="main-card">
+            <div class="chat-screen-content">
+                <div class="avatar-circle" id="avatarCircle"></div>
+                
+                <div class="audio-indicator" id="audioIndicator" style="display: none;">
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                </div>
+
+                <div class="status-message" id="statusMessage">Подключено</div>
+
+                <div class="chat-controls" id="chatControls">
+                    <button class="control-btn" id="skipBtn">⏭️ Скип</button>
+                    <button class="control-btn" id="muteBtn">🔇 Мут</button>
+                </div>
+
+                <div class="disconnected-actions" id="disconnectedActions" style="display: none;">
+                    <button class="action-btn" id="searchNewBtn">🔍 Искать нового</button>
+                    <button class="action-btn secondary" id="backToMenuBtn">📋 Меню</button>
                 </div>
             </div>
         </div>
-
-        <div class="title-section">
-            <h1 class="main-title">LOST UNDERGROUND</h1>
-            <p class="subtitle">подземное выживание</p>
-        </div>
-
-        <div class="status-container" id="statusContainer">
-            <div class="status-line">Подготовка</div>
-            <div class="status-line">Подключение к серверу</div>
-            <div class="status-line">Инициализация</div>
-            <div class="status-line">Загрузка ресурсов</div>
-            <div class="status-line">Ожидание</div>
-        </div>
     </div>
 
+    <audio id="remoteAudio" autoplay></audio>
+
     <script>
-        let statusHistory = [
-            'Подготовка',
-            'Подключение к серверу',
-            'Инициализация',
-            'Загрузка ресурсов',
-            'Ожидание'
+        // Firebase конфигурация (замените на свою)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDummyKeyForExample123456789",
+            authDomain: "morfa-chat.firebaseapp.com",
+            databaseURL: "https://morfa-chat-default-rtdb.firebaseio.com",
+            projectId: "morfa-chat",
+            storageBucket: "morfa-chat.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abc123def456"
+        };
+
+        // Инициализация Firebase (используем публичную тестовую БД)
+        let database;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+        } catch (error) {
+            console.log("Firebase не подключен, используем локальный режим");
+        }
+
+        // Глобальные переменные
+        let myGender = null;
+        let lookingFor = null;
+        let myAge = null;
+        let myPeerId = null;
+        let peer = null;
+        let currentCall = null;
+        let myStream = null;
+        let isMuted = false;
+        let isConnected = false;
+        let onlineCountValue = 0;
+        let myUserRef = null;
+        let partnerPeerId = null;
+
+        // Массив аватаров
+        const avatarImages = [
+            'https://i.pinimg.com/originals/a0/25/0d/a0250d4548856dd49e3724f1d637e45b.jpg',
+            'https://i.pinimg.com/736x/3f/94/28/3f9428f9352f318b2d8d058bb4e008de.jpg',
+            'https://i.pinimg.com/originals/ff/bc/15/ffbc15ce4660e2b5dbdce0797b2011c5.jpg',
+            'https://i.pinimg.com/originals/51/0e/75/510e75dbfdf2d58a4105d7006ce9cfc3.jpg',
+            'https://i.pinimg.com/736x/ba/7c/5f/ba7c5f99707de63cd048055f42766e7d.jpg'
         ];
+        let currentAvatarIndex = 0;
 
-        let currentProgress = 0;
-        let filesDownloaded = 0;
-        let filesTotal = 0;
-        let isGmodActive = false;
-        let backgroundIndex = 0;
+        // Элементы DOM
+        const settingsScreen = document.getElementById('settingsScreen');
+        const searchScreen = document.getElementById('searchScreen');
+        const chatScreen = document.getElementById('chatScreen');
+        const onlineCountEl = document.getElementById('onlineCount');
+        const startChatBtn = document.getElementById('startChatBtn');
+        const avatarCircle = document.getElementById('avatarCircle');
+        const statusMessage = document.getElementById('statusMessage');
+        const chatControls = document.getElementById('chatControls');
+        const disconnectedActions = document.getElementById('disconnectedActions');
+        const audioIndicator = document.getElementById('audioIndicator');
 
-        const backgroundImages = [
-            'https://garry-s-mod.ru/wp-content/uploads/2022/02/24787.jpg',
-            'https://garry-s-mod.ru/wp-content/uploads/2020/09/35878.jpg',
-            'https://garry-s-mod.ru/wp-content/uploads/2020/09/14656.jpg'
-        ];
-
-        const bgElements = [
-            document.getElementById('bgImage1'),
-            document.getElementById('bgImage2'),
-            document.getElementById('bgImage3')
-        ];
-
-        function initBackgrounds() {
-            bgElements.forEach((element, index) => {
-                if (element && backgroundImages[index]) {
-                    element.style.backgroundImage = `url('${backgroundImages[index]}')`;
-                }
-            });
-
-            if (bgElements[0]) {
-                bgElements[0].classList.add('active');
-            }
+        // Создание лепестков сакуры
+        function createSakuraPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('sakura-petal');
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.animation = `sakura-fall ${Math.random() * 5 + 8}s linear`;
+            petal.style.animationDelay = Math.random() * 2 + 's';
+            petal.style.opacity = Math.random() * 0.6 + 0.4;
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), 15000);
         }
 
-        function changeBackground() {
-            bgElements.forEach(bg => {
-                if (bg) bg.classList.remove('active');
-            });
+        setInterval(createSakuraPetal, 200);
 
-            backgroundIndex = (backgroundIndex + 1) % bgElements.length;
-
-            if (bgElements[backgroundIndex]) {
-                bgElements[backgroundIndex].classList.add('active');
-            }
-        }
-
-        function updateStatusDisplay(newStatus) {
-            if (!newStatus) return;
-
-            statusHistory.push(newStatus);
-
-            if (statusHistory.length > 5) {
-                statusHistory.shift();
-            }
-
-            const container = document.getElementById('statusContainer');
-            if (!container) return;
-
-            container.innerHTML = '';
-
-            statusHistory.forEach((status, index) => {
-                const line = document.createElement('div');
-                line.className = 'status-line';
-
-                const maxLength = 65;
-                const displayStatus = status.length > maxLength 
-                    ? status.substring(0, maxLength - 3) 
-                    : status;
-
-                line.textContent = displayStatus;
-
-                const opacities = [0.35, 0.45, 0.65, 0.85, 1];
-                line.style.setProperty('--final-opacity', opacities[index] || 1);
-
-                container.appendChild(line);
-            });
-        }
-
-        const autoStatuses = [
-            'Подключение к серверу',
-            'Получение информации о сервере',
-            'Синхронизация данных',
-            'Загрузка конфигурации',
-            'Получение списка файлов',
-            'Загрузка карты',
-            'Загрузка моделей',
-            'Загрузка текстур',
-            'Загрузка материалов',
-            'Загрузка звуков',
-            'Загрузка скриптов',
-            'Подготовка игрового мира',
-            'Инициализация системы',
-            'Проверка целостности файлов',
-            'Оптимизация ресурсов',
-            'Финальная подготовка'
-        ];
-
-        let autoStatusIndex = 0;
-
-        function autoUpdateStatus() {
-            if (!isGmodActive && currentProgress < 95) {
-                const status = autoStatuses[autoStatusIndex % autoStatuses.length];
-                updateStatusDisplay(status);
-                autoStatusIndex++;
-            }
-        }
-
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            isGmodActive = true;
-
-            if (servername) {
-                updateStatusDisplay('Подключено к: ' + servername);
-            }
-
-            if (mapname) {
-                updateStatusDisplay('Карта: ' + mapname);
-            }
-
-            if (gamemode) {
-                updateStatusDisplay('Режим игры: ' + gamemode);
-            }
-        }
-
-        function SetStatusChanged(status) {
-            isGmodActive = true;
-
-            if (status) {
-                updateStatusDisplay(status);
-            }
-        }
-
-        function DownloadingFile(fileName) {
-            isGmodActive = true;
-
-            if (fileName) {
-                const pathParts = fileName.split('/');
-                const shortName = pathParts[pathParts.length - 1];
-                
-                const displayName = shortName.length > 45 
-                    ? shortName.substring(shortName.length - 42) 
-                    : shortName;
-
-                updateStatusDisplay('Загрузка: ' + displayName);
-            }
-        }
-
-        function SetFilesNeeded(needed) {
-            isGmodActive = true;
-            filesTotal = parseInt(needed) || 0;
-            updateStatusDisplay('Необходимо загрузить файлов: ' + needed);
-        }
-
-        function SetFilesTotal(total) {
-            isGmodActive = true;
-            filesTotal = parseInt(total) || 0;
-            updateStatusDisplay('Всего файлов: ' + total);
-        }
-
-        function SetFilesDownloaded(downloaded) {
-            isGmodActive = true;
-            filesDownloaded = parseInt(downloaded) || 0;
-        }
-
-        function SetLoadProgress(progress) {
-            isGmodActive = true;
-            currentProgress = parseFloat(progress) || 0;
-
-            if (currentProgress > 100) {
-                currentProgress = 100;
-            }
-
-            if (currentProgress >= 100) {
-                updateStatusDisplay('Загрузка завершена');
-                
-                setTimeout(() => {
-                    const mainContent = document.querySelector('.main-content');
-                    if (mainContent) {
-                        mainContent.classList.add('fade-out');
-                    }
-
-                    setTimeout(() => {
-                        document.body.style.display = 'none';
-                    }, 1200);
-                }, 800);
+        // Обновление счетчика онлайн
+        function updateOnlineCount() {
+            if (database) {
+                const usersRef = database.ref('users');
+                usersRef.on('value', (snapshot) => {
+                    const users = snapshot.val();
+                    onlineCountValue = users ? Object.keys(users).length : 0;
+                    onlineCountEl.textContent = onlineCountValue;
+                });
             } else {
-                updateStatusDisplay(`Загрузка ${Math.floor(currentProgress)}%`);
+                // Симуляция для локального режима
+                onlineCountValue = Math.floor(Math.random() * 50) + 20;
+                onlineCountEl.textContent = onlineCountValue;
+                setInterval(() => {
+                    onlineCountValue += Math.floor(Math.random() * 5) - 2;
+                    onlineCountValue = Math.max(15, Math.min(100, onlineCountValue));
+                    onlineCountEl.textContent = onlineCountValue;
+                }, 5000);
             }
         }
 
-        function initialize() {
-            console.log('Lost Underground - Загрузка инициализирована');
+        updateOnlineCount();
 
-            initBackgrounds();
+        // Выбор настроек
+        document.querySelectorAll('[data-gender]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-gender]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                myGender = this.dataset.gender;
+                checkSettings();
+            });
+        });
 
-            setInterval(changeBackground, 7000);
+        document.querySelectorAll('[data-looking]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-looking]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                lookingFor = this.dataset.looking;
+                checkSettings();
+            });
+        });
 
-            setInterval(autoUpdateStatus, 3500);
+        document.querySelectorAll('[data-age]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-age]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                myAge = this.dataset.age;
+                checkSettings();
+            });
+        });
 
-            setTimeout(() => {
-                if (!isGmodActive) {
-                    updateStatusDisplay('Установка соединения');
-                }
-            }, 1500);
-
-            setTimeout(() => {
-                if (!isGmodActive) {
-                    updateStatusDisplay('Получение данных сервера');
-                }
-            }, 4000);
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initialize);
-        } else {
-            initialize();
-        }
-
-        window.addEventListener('error', function(e) {
-            if (e.target.tagName === 'IMG') {
-                console.warn('Не удалось загрузить изображение:', e.target.src);
+        function checkSettings() {
+            if (myGender && lookingFor && myAge) {
+                startChatBtn.disabled = false;
             }
-        }, true);
+        }
 
+        // Показ экранов
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Начало поиска
+        startChatBtn.addEventListener('click', async () => {
+            document.getElementById('searchCategory').textContent = `Ищем: ${lookingFor === 'male' ? 'мальчиков' : 'девочек'}, возраст: ${myAge}`;
+            showScreen('searchScreen');
+            await initializePeer();
+        });
+
+        // Инициализация PeerJS
+        async function initializePeer() {
+            try {
+                // Запрос доступа к микрофону
+                myStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                
+                // Создание Peer
+                peer = new Peer();
+
+                peer.on('open', (id) => {
+                    myPeerId = id;
+                    console.log('My peer ID:', myPeerId);
+                    registerUser();
+                    findPartner();
+                });
+
+                peer.on('call', (call) => {
+                    console.log('Получен входящий звонок');
+                    call.answer(myStream);
+                    handleCall(call);
+                });
+
+                peer.on('error', (err) => {
+                    console.error('Ошибка Peer:', err);
+                    statusMessage.textContent = 'Ошибка подключения. Попробуйте снова.';
+                });
+
+            } catch (error) {
+                console.error('Ошибка доступа к микрофону:', error);
+                alert('Необходим доступ к микрофону для голосового чата!');
+                showScreen('settingsScreen');
+            }
+        }
+
+        // Регистрация пользователя в базе
+        function registerUser() {
+            if (!database) return;
+
+            const userRef = database.ref('users/' + myPeerId);
+            myUserRef = userRef;
+
+            userRef.set({
+                peerId: myPeerId,
+                gender: myGender,
+                lookingFor: lookingFor,
+                age: myAge,
+                status: 'searching',
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            // Удаление при отключении
+            userRef.onDisconnect().remove();
+        }
+
+        // Поиск партнера
+        function findPartner() {
+            if (!database) {
+                // Симуляция для локального режима
+                setTimeout(() => {
+                    showScreen('chatScreen');
+                    statusMessage.textContent = 'Тестовый режим (нет подключения к серверу)';
+                    audioIndicator.style.display = 'flex';
+                }, 2000);
+                return;
+            }
+
+            const usersRef = database.ref('users');
+            
+            usersRef.once('value', (snapshot) => {
+                const users = snapshot.val();
+                let foundPartner = false;
+
+                if (users) {
+                    for (let userId in users) {
+                        const user = users[userId];
+                        
+                        // Проверка совместимости
+                        if (userId !== myPeerId && 
+                            user.status === 'searching' &&
+                            user.gender === lookingFor &&
+                            user.lookingFor === myGender) {
+                            
+                            foundPartner = true;
+                            partnerPeerId = user.peerId;
+                            connectToPartner(partnerPeerId);
+                            
+                            // Обновление статусов
+                            myUserRef.update({ status: 'connected', partnerId: partnerPeerId });
+                            database.ref('users/' + partnerPeerId).update({ status: 'connected', partnerId: myPeerId });
+                            
+                            break;
+                        }
+                    }
+                }
+
+                if (!foundPartner) {
+                    // Продолжить поиск
+                    setTimeout(() => findPartner(), 2000);
+                }
+            });
+        }
+
+        // Подключение к партнеру
+        function connectToPartner(partnerId) {
+            console.log('Подключение к партнеру:', partnerId);
+            
+            const call = peer.call(partnerId, myStream);
+            handleCall(call);
+        }
+
+        // Обработка звонка
+        function handleCall(call) {
+            currentCall = call;
+            
+            call.on('stream', (remoteStream) => {
+                console.log('Получен удаленный поток');
+                document.getElementById('remoteAudio').srcObject = remoteStream;
+                isConnected = true;
+                showScreen('chatScreen');
+                statusMessage.textContent = 'Подключено';
+                audioIndicator.style.display = 'flex';
+                chatControls.style.display = 'flex';
+                disconnectedActions.style.display = 'none';
+            });
+
+            call.on('close', () => {
+                console.log('Звонок завершен');
+                handleDisconnect();
+            });
+
+            call.on('error', (err) => {
+                console.error('Ошибка звонка:', err);
+                handleDisconnect();
+            });
+        }
+
+        // Обработка отключения
+        function handleDisconnect() {
+            isConnected = false;
+            audioIndicator.style.display = 'none';
+            chatControls.style.display = 'none';
+            disconnectedActions.style.display = 'flex';
+            statusMessage.textContent = 'Собеседник отключился';
+            
+            if (currentCall) {
+                currentCall.close();
+                currentCall = null;
+            }
+
+            if (database && myUserRef) {
+                myUserRef.update({ status: 'searching', partnerId: null });
+            }
+        }
+
+        // Смена аватара
+        avatarCircle.addEventListener('click', () => {
+            currentAvatarIndex = (currentAvatarIndex + 1) % avatarImages.length;
+            avatarCircle.classList.add('switching');
+            
+            setTimeout(() => {
+                avatarCircle.style.backgroundImage = `url('${avatarImages[currentAvatarIndex]}')`;
+            }, 300);
+            
+            setTimeout(() => {
+                avatarCircle.classList.remove('switching');
+            }, 600);
+        });
+
+        // Кнопка Скип
+        document.getElementById('skipBtn').addEventListener('click', () => {
+            if (currentCall) {
+                currentCall.close();
+            }
+            handleDisconnect();
+        });
+
+        // Кнопка Мут
+        document.getElementById('muteBtn').addEventListener('click', function() {
+            if (myStream) {
+                isMuted = !isMuted;
+                myStream.getAudioTracks()[0].enabled = !isMuted;
+                
+                if (isMuted) {
+                    this.textContent = '🔊 Размутить';
+                    this.classList.add('muted');
+                    statusMessage.textContent = 'Вы замутились';
+                } else {
+                    this.textContent = '🔇 Мут';
+                    this.classList.remove('muted');
+                    statusMessage.textContent = 'Подключено';
+                }
+            }
+        });
+
+        // Искать нового
+        document.getElementById('searchNewBtn').addEventListener('click', () => {
+            showScreen('searchScreen');
+            findPartner();
+        });
+
+        // Вернуться в меню
+        document.getElementById('backToMenuBtn').addEventListener('click', () => {
+            if (peer) {
+                peer.destroy();
+            }
+            if (myStream) {
+                myStream.getTracks().forEach(track => track.stop());
+            }
+            if (database && myUserRef) {
+                myUserRef.remove();
+            }
+            
+            showScreen('settingsScreen');
+            
+            // Сброс настроек
+            document.querySelectorAll('.select-btn.selected').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            myGender = null;
+            lookingFor = null;
+            myAge = null;
+            startChatBtn.disabled = true;
+            isMuted = false;
+        });
+
+        // Очистка при закрытии страницы
+        window.addEventListener('beforeunload', () => {
+            if (database && myUserRef) {
+                myUserRef.remove();
+            }
+            if (peer) {
+                peer.destroy();
+            }
+            if (myStream) {
+                myStream.getTracks().forEach(track => track.stop());
+            }
+        });
     </script>
 </body>
 </html>
