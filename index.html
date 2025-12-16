@@ -3,1253 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MORFA Voice Chat - Анонимный голосовой чат</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background-image: url('https://textur.gas-kvas.com/uploads/posts/2024-10/textur-gas-kvas-com-cx7g-p-teksturi-lepestki-sakuri-10.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(30, 0, 50, 0.5) 100%);
-            backdrop-filter: blur(3px);
-            z-index: 0;
-        }
-
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .wave {
-            position: absolute;
-            width: 200%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 182, 193, 0.1), transparent);
-            animation: wave 15s linear infinite;
-        }
-
-        .wave:nth-child(2) {
-            animation-delay: -5s;
-            opacity: 0.5;
-        }
-
-        .wave:nth-child(3) {
-            animation-delay: -10s;
-            opacity: 0.3;
-        }
-
-        @keyframes wave {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0%); }
-        }
-
-        .sakura-petal {
-            position: fixed;
-            width: 15px;
-            height: 15px;
-            pointer-events: none;
-            z-index: 1;
-            top: -50px;
-        }
-
-        .sakura-petal::before {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: radial-gradient(circle at 30% 30%, #FFE5EC, #FFB7C5);
-            border-radius: 50% 0 50% 0;
-            transform: rotate(45deg);
-            box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
-        }
-
-        .sakura-petal::after {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: radial-gradient(circle at 70% 30%, #FFC1D5, #FF9EBF);
-            border-radius: 0 50% 0 50%;
-            transform: rotate(-45deg) translateX(3px);
-            box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
-        }
-
-        @keyframes sakura-fall {
-            0% {
-                transform: translateY(0) rotate(0deg) translateX(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg) translateX(100px);
-                opacity: 0.3;
-            }
-        }
-
-        .online-counter {
-            position: fixed;
-            top: 30px;
-            left: 30px;
-            z-index: 1000;
-            background: linear-gradient(135deg, rgba(255, 105, 180, 0.95), rgba(255, 182, 193, 0.95));
-            backdrop-filter: blur(20px);
-            border: 3px solid rgba(255, 255, 255, 0.6);
-            border-radius: 25px;
-            padding: 15px 25px;
-            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: pulse-counter 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-counter {
-            0%, 100% {
-                box-shadow: 0 10px 30px rgba(255, 105, 180, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3);
-            }
-            50% {
-                box-shadow: 0 10px 45px rgba(255, 105, 180, 0.8), inset 0 2px 0 rgba(255, 255, 255, 0.5);
-            }
-        }
-
-        .online-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #4ade80;
-            animation: blink 2s infinite;
-            box-shadow: 0 0 15px #4ade80;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .online-text {
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-        }
-
-        .screen {
-            display: none;
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
-        }
-
-        .screen.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .main-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 182, 193, 0.1) 100%);
-            backdrop-filter: blur(30px) saturate(180%);
-            border-radius: 35px;
-            padding: 50px 40px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 105, 180, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            width: 100%;
-        }
-
-        .title {
-            text-align: center;
-            color: #fff;
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-shadow: 0 0 20px rgba(255, 105, 180, 0.8), 3px 3px 10px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 182, 193, 0.6);
-            letter-spacing: 4px;
-            animation: title-glow 3s ease-in-out infinite;
-        }
-
-        @keyframes title-glow {
-            0%, 100% {
-                text-shadow: 0 0 20px rgba(255, 105, 180, 0.8), 3px 3px 10px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 182, 193, 0.6);
-            }
-            50% {
-                text-shadow: 0 0 30px rgba(255, 105, 180, 1), 3px 3px 15px rgba(0, 0, 0, 0.9), 0 0 60px rgba(255, 182, 193, 0.9);
-            }
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #FFD1DC;
-            font-size: 18px;
-            margin-bottom: 30px;
-            font-weight: 400;
-            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
-        }
-
-        .section-title {
-            color: white;
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-        }
-
-        .gender-select, .age-select {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .age-select {
-            grid-template-columns: repeat(4, 1fr);
-        }
-
-        .select-btn {
-            background: linear-gradient(135deg, rgba(255, 105, 180, 0.7), rgba(255, 182, 193, 0.7));
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 18px;
-            padding: 15px 20px;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .select-btn img {
-            width: 24px;
-            height: 24px;
-            filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
-        }
-
-        .select-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.5);
-        }
-
-        .select-btn.selected {
-            background: linear-gradient(135deg, #ff1493, #ff69b4);
-            border-color: white;
-            transform: scale(1.05);
-            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.6);
-        }
-
-        .start-chat-btn {
-            background: linear-gradient(135deg, #4ade80, #22c55e);
-            border: 3px solid rgba(255, 255, 255, 0.6);
-            border-radius: 25px;
-            padding: 18px 50px;
-            color: white;
-            font-weight: 700;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 10px 30px rgba(74, 222, 128, 0.5);
-            display: block;
-            margin: 30px auto 0;
-            width: 100%;
-        }
-
-        .start-chat-btn:hover:not(:disabled) {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(74, 222, 128, 0.7);
-        }
-
-        .start-chat-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .search-animation {
-            text-align: center;
-            padding: 60px 20px 30px;
-        }
-
-        .spinner {
-            width: 80px;
-            height: 80px;
-            border: 6px solid rgba(255, 105, 180, 0.3);
-            border-top-color: #ff69b4;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 30px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .search-text {
-            color: white;
-            font-size: 24px;
-            font-weight: 600;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-            margin-bottom: 10px;
-        }
-
-        .debug-info {
-            color: #FFD1DC;
-            font-size: 14px;
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            text-align: left;
-            max-height: 150px;
-            overflow-y: auto;
-            font-family: monospace;
-        }
-
-        .menu-btn-search {
-            background: linear-gradient(135deg, rgba(255, 105, 180, 0.9), rgba(255, 182, 193, 0.9));
-            border: 3px solid rgba(255, 255, 255, 0.6);
-            border-radius: 20px;
-            padding: 15px 40px;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
-            margin-top: 30px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .menu-btn-search:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.7);
-        }
-
-        .menu-btn-search img {
-            width: 20px;
-            height: 20px;
-            filter: brightness(0) invert(1) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
-        }
-
-        .chat-screen-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-            padding: 40px 20px;
-        }
-
-        .avatar-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 5px solid rgba(255, 182, 193, 0.8);
-            background-size: cover;
-            background-position: center;
-            background-image: url('https://i.pinimg.com/originals/a0/25/0d/a0250d4548856dd49e3724f1d637e45b.jpg');
-            box-shadow: 0 15px 40px rgba(255, 105, 180, 0.6), 0 0 60px rgba(255, 105, 180, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            transition: all 0.4s ease;
-            position: relative;
-        }
-
-        .avatar-circle::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 105, 180, 0.2));
-            border-radius: 50%;
-        }
-
-        .avatar-circle:hover {
-            transform: scale(1.08) rotate(5deg);
-            box-shadow: 0 20px 50px rgba(255, 105, 180, 0.8);
-        }
-
-        .avatar-circle.switching {
-            animation: switchAvatar 0.6s ease-in-out;
-        }
-
-        @keyframes switchAvatar {
-            0% { transform: scale(1) rotate(0deg); opacity: 1; }
-            50% { transform: scale(0.7) rotate(180deg); opacity: 0.3; }
-            100% { transform: scale(1) rotate(360deg); opacity: 1; }
-        }
-
-        .chat-controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .control-btn {
-            background: linear-gradient(135deg, rgba(255, 105, 180, 0.9), rgba(255, 182, 193, 0.9));
-            backdrop-filter: blur(10px);
-            border: 3px solid rgba(255, 255, 255, 0.6);
-            border-radius: 20px;
-            padding: 15px 30px;
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .control-btn img {
-            width: 20px;
-            height: 20px;
-            filter: brightness(0) invert(1) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
-        }
-
-        .control-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.7);
-        }
-
-        .control-btn.muted {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-        }
-
-        .status-message {
-            color: white;
-            font-size: 18px;
-            text-align: center;
-            padding: 15px 25px;
-            background: rgba(255, 105, 180, 0.3);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .disconnected-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .action-btn {
-            background: linear-gradient(135deg, #4ade80, #22c55e);
-            border: 3px solid rgba(255, 255, 255, 0.6);
-            border-radius: 20px;
-            padding: 18px 30px;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .action-btn img {
-            width: 24px;
-            height: 24px;
-            filter: brightness(0) invert(1) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
-        }
-
-        .action-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(74, 222, 128, 0.7);
-        }
-
-        .action-btn.secondary {
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
-        }
-
-        .action-btn.secondary:hover {
-            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.7);
-        }
-
-        .audio-indicator {
-            width: 40px;
-            height: 30px;
-            display: flex;
-            gap: 5px;
-            align-items: flex-end;
-            justify-content: center;
-            margin: 0 auto;
-        }
-
-        .audio-bar {
-            width: 5px;
-            background: linear-gradient(to top, #4ade80, #22c55e);
-            border-radius: 3px;
-            animation: audioWave 0.8s ease-in-out infinite;
-        }
-
-        .audio-bar:nth-child(1) { height: 10px; animation-delay: 0s; }
-        .audio-bar:nth-child(2) { height: 20px; animation-delay: 0.2s; }
-        .audio-bar:nth-child(3) { height: 15px; animation-delay: 0.4s; }
-
-        @keyframes audioWave {
-            0%, 100% { transform: scaleY(0.5); }
-            50% { transform: scaleY(1.5); }
-        }
-
-        @media (max-width: 768px) {
-            .online-counter {
-                top: 15px;
-                left: 15px;
-                padding: 10px 15px;
-            }
-
-            .title {
-                font-size: 32px;
-            }
-
-            .main-card {
-                padding: 35px 25px;
-            }
-
-            .avatar-circle {
-                width: 160px;
-                height: 160px;
-            }
-
-            .chat-controls {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .control-btn {
-                width: 100%;
-            }
-
-            .age-select {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-    </style>
+    <title>RUGRAM - Мессенджер</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="animated-bg">
-        <div class="wave"></div>
-        <div class="wave"></div>
-        <div class="wave"></div>
-    </div>
 
-    <div class="online-counter">
-        <div class="online-dot"></div>
-        <span class="online-text">Онлайн: <span id="onlineCount">1</span></span>
-    </div>
-
-    <!-- Экран настройки категорий -->
-    <div class="screen active" id="settingsScreen">
-        <div class="main-card">
-            <h1 class="title">MORFA VOICE</h1>
-            <p class="subtitle">Анонимный голосовой чат</p>
-            
-            <div>
-                <h3 class="section-title">Вы:</h3>
-                <div class="gender-select">
-                    <button class="select-btn" data-gender="male">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="Мальчик">
-                        Мальчик
-                    </button>
-                    <button class="select-btn" data-gender="female">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3237/3237420.png" alt="Девочка">
-                        Девочка
-                    </button>
-                </div>
+    <!-- ЭКРАН ЗАГРУЗКИ -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-content">
+            <div class="logo-animation">
+                <i class="fas fa-paper-plane"></i>
             </div>
-
-            <div>
-                <h3 class="section-title">Ищу:</h3>
-                <div class="gender-select">
-                    <button class="select-btn" data-looking="male">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Мальчиков">
-                        Мальчиков
-                    </button>
-                    <button class="select-btn" data-looking="female">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135789.png" alt="Девочек">
-                        Девочек
-                    </button>
-                </div>
+            <h1 class="app-title">RUGRAM</h1>
+            <p class="app-subtitle">Безопасный мессенджер</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
             </div>
-
-            <div>
-                <h3 class="section-title">Ваш возраст:</h3>
-                <div class="age-select">
-                    <button class="select-btn" data-age="10">10</button>
-                    <button class="select-btn" data-age="11">11</button>
-                    <button class="select-btn" data-age="12">12</button>
-                    <button class="select-btn" data-age="13">13</button>
-                    <button class="select-btn" data-age="14">14</button>
-                    <button class="select-btn" data-age="15">15</button>
-                    <button class="select-btn" data-age="16">16</button>
-                    <button class="select-btn" data-age="16+">16+</button>
-                </div>
-            </div>
-
-            <button class="start-chat-btn" id="startChatBtn" disabled>Начать чат</button>
         </div>
     </div>
 
-    <!-- Экран поиска -->
-    <div class="screen" id="searchScreen">
-        <div class="main-card">
-            <div class="search-animation">
-                <div class="spinner"></div>
-                <div class="search-text">Ищем собеседника...</div>
-                <div class="subtitle" id="searchCategory"></div>
-                <div class="debug-info" id="debugInfo">Инициализация...</div>
-                <button class="menu-btn-search" id="backFromSearchBtn">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" alt="Меню">
-                    Меню
+    <!-- ЭКРАН АВТОРИЗАЦИИ -->
+    <div id="authScreen" class="auth-screen hidden">
+        
+        <!-- Анимированный фон -->
+        <div class="animated-bg">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+        </div>
+
+        <div class="auth-container">
+            
+            <!-- Логотип -->
+            <div class="auth-logo-wrapper">
+                <div class="auth-logo">
+                    <i class="fas fa-paper-plane"></i>
+                </div>
+                <h1 class="auth-brand">RUGRAM</h1>
+                <p class="auth-tagline">Общайся безопасно</p>
+            </div>
+
+            <!-- Переключатель форм -->
+            <div class="form-tabs">
+                <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">
+                    <i class="fas fa-sign-in-alt"></i> Вход
+                </button>
+                <button class="tab-btn" id="registerTab" onclick="switchTab('register')">
+                    <i class="fas fa-user-plus"></i> Регистрация
+                </button>
+            </div>
+
+            <!-- ФОРМА ВХОДА -->
+            <div id="loginForm" class="auth-form active">
+                <div class="form-content">
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="loginEmail" placeholder="Введите email" class="form-input">
+                    </div>
+                    
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="loginPassword" placeholder="Введите пароль" class="form-input">
+                        <i class="fas fa-eye toggle-icon" onclick="togglePassword('loginPassword')"></i>
+                    </div>
+
+                    <button class="submit-btn" onclick="handleLogin()">
+                        <span>Войти</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ФОРМА РЕГИСТРАЦИИ -->
+            <div id="registerForm" class="auth-form">
+                <div class="form-content">
+                    <div class="input-wrapper">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" id="registerName" placeholder="Ваше имя" class="form-input">
+                    </div>
+
+                    <div class="input-wrapper">
+                        <i class="fas fa-at input-icon"></i>
+                        <input type="text" id="registerUsername" placeholder="Username (латиница)" class="form-input">
+                    </div>
+                    
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="registerEmail" placeholder="Email" class="form-input">
+                    </div>
+                    
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="registerPassword" placeholder="Пароль (мин. 6)" class="form-input">
+                        <i class="fas fa-eye toggle-icon" onclick="togglePassword('registerPassword')"></i>
+                    </div>
+                    
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="registerPasswordConfirm" placeholder="Повторите пароль" class="form-input">
+                    </div>
+
+                    <button class="submit-btn" onclick="handleRegister()">
+                        <span>Создать аккаунт</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ГЛАВНЫЙ ЭКРАН -->
+    <div id="mainScreen" class="main-screen hidden">
+        
+        <!-- БОКОВАЯ ПАНЕЛЬ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fas fa-paper-plane brand-icon"></i>
+                    <h2>RUGRAM</h2>
+                </div>
+                <button class="btn-icon" onclick="openNewChatDialog()">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchChats" placeholder="Поиск чатов...">
+            </div>
+
+            <div class="chats-list" id="chatsList">
+                <div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <p>Нет активных чатов</p>
+                    <button class="start-chat-btn" onclick="openNewChatDialog()">
+                        <i class="fas fa-plus"></i> Начать общение
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-profile" onclick="openProfileDialog()">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h4 id="sidebarName">Загрузка...</h4>
+                        <p id="sidebarUsername">@username</p>
+                    </div>
+                    <i class="fas fa-cog settings-icon"></i>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ОБЛАСТЬ ЧАТА -->
+        <main class="chat-area">
+            
+            <div id="emptyChat" class="empty-chat">
+                <div class="empty-content">
+                    <div class="empty-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h2>Добро пожаловать в RUGRAM</h2>
+                    <p>Выберите чат или начните новую переписку</p>
+                </div>
+            </div>
+
+            <div id="activeChat" class="active-chat hidden">
+                <div class="chat-header">
+                    <button class="btn-back" onclick="closeActiveChat()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="chat-user">
+                        <div class="chat-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="chat-info">
+                            <h3 id="chatName">Имя</h3>
+                            <p class="status" id="chatStatus">был(а) недавно</p>
+                        </div>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="messages-area" id="messagesContainer">
+                    <div class="loading-messages">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Загрузка сообщений...</p>
+                    </div>
+                </div>
+
+                <div class="message-input-area">
+                    <button class="btn-icon">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <div class="input-box">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Напишите сообщение..." 
+                            rows="1"
+                            onkeydown="handleKeyPress(event)"
+                            oninput="autoResize(this)"></textarea>
+                        <button class="btn-icon">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                    </div>
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: НОВЫЙ ЧАТ -->
+    <div id="newChatDialog" class="modal hidden">
+        <div class="modal-overlay" onclick="closeDialog('newChatDialog')"></div>
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Новый чат</h3>
+                <button class="close-btn" onclick="closeDialog('newChatDialog')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchUsers" placeholder="Поиск пользователя..." oninput="searchUsers(this.value)">
+                </div>
+                <div class="users-list" id="usersList">
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>Введите username для поиска</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: ПРОФИЛЬ -->
+    <div id="profileDialog" class="modal hidden">
+        <div class="modal-overlay" onclick="closeDialog('profileDialog')"></div>
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Мой профиль</h3>
+                <button class="close-btn" onclick="closeDialog('profileDialog')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content profile-content">
+                <div class="profile-header">
+                    <div class="profile-avatar-large">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <button class="change-photo-btn">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+                <div class="profile-data">
+                    <div class="data-item">
+                        <label>Имя</label>
+                        <p id="profileName">Загрузка...</p>
+                    </div>
+                    <div class="data-item">
+                        <label>Username</label>
+                        <p id="profileUsername">@username</p>
+                    </div>
+                    <div class="data-item">
+                        <label>Email</label>
+                        <p id="profileEmail">email@example.com</p>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти из аккаунта</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Экран чата -->
-    <div class="screen" id="chatScreen">
-        <div class="main-card">
-            <div class="chat-screen-content">
-                <div class="avatar-circle" id="avatarCircle"></div>
-                
-                <div class="audio-indicator" id="audioIndicator" style="display: none;">
-                    <div class="audio-bar"></div>
-                    <div class="audio-bar"></div>
-                    <div class="audio-bar"></div>
-                </div>
+    <!-- УВЕДОМЛЕНИЯ -->
+    <div id="notifications" class="notifications"></div>
 
-                <div class="status-message" id="statusMessage">Подключено</div>
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-                <div class="chat-controls" id="chatControls">
-                    <button class="control-btn" id="skipBtn">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3916/3916790.png" alt="Скип">
-                        Скип
-                    </button>
-                    <button class="control-btn" id="muteBtn">
-                        <img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" alt="Мут">
-                        Мут
-                    </button>
-                </div>
+    <!-- APP -->
+    <script src="app.js"></script>
 
-                <div class="disconnected-actions" id="disconnectedActions" style="display: none;">
-                    <button class="action-btn" id="searchNewBtn">
-                        <img src="https://cdn-icons-png.flaticon.com/512/751/751463.png" alt="Поиск">
-                        Искать нового
-                    </button>
-                    <button class="action-btn secondary" id="backToMenuBtn">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" alt="Меню">
-                        Меню
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <audio id="remoteAudio" autoplay></audio>
-
-    <script>
-        // ПУБЛИЧНАЯ FIREBASE КОНФИГУРАЦИЯ (РЕАЛЬНАЯ БД ДЛЯ ТЕСТОВ)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkX8v_qF5tYzqKZJ7xN9rF8vH3pL9mE4c",
-            authDomain: "morfa-voice-test.firebaseapp.com",
-            databaseURL: "https://morfa-voice-test-default-rtdb.firebaseio.com",
-            projectId: "morfa-voice-test",
-            storageBucket: "morfa-voice-test.appspot.com",
-            messagingSenderId: "987654321098",
-            appId: "1:987654321098:web:test123456789"
-        };
-
-        // Инициализация Firebase
-        let database;
-        let useFirebase = true;
-        
-        try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            database = firebase.database();
-            console.log("✅ Firebase подключен успешно");
-        } catch (error) {
-            console.error("❌ Ошибка Firebase:", error);
-            useFirebase = false;
-        }
-
-        // Глобальные переменные
-        let myGender = null;
-        let lookingFor = null;
-        let myAge = null;
-        let myPeerId = null;
-        let myUserId = null;
-        let peer = null;
-        let currentCall = null;
-        let myStream = null;
-        let isMuted = false;
-        let isConnected = false;
-        let onlineCountValue = 1;
-        let myUserRef = null;
-        let searchInterval = null;
-        let isSearching = false;
-
-        // Массив аватаров
-        const avatarImages = [
-            'https://i.pinimg.com/originals/a0/25/0d/a0250d4548856dd49e3724f1d637e45b.jpg',
-            'https://i.pinimg.com/736x/3f/94/28/3f9428f9352f318b2d8d058bb4e008de.jpg',
-            'https://i.pinimg.com/originals/ff/bc/15/ffbc15ce4660e2b5dbdce0797b2011c5.jpg',
-            'https://i.pinimg.com/originals/51/0e/75/510e75dbfdf2d58a4105d7006ce9cfc3.jpg',
-            'https://i.pinimg.com/736x/ba/7c/5f/ba7c5f99707de63cd048055f42766e7d.jpg'
-        ];
-        let currentAvatarIndex = 0;
-
-        // Элементы DOM
-        const settingsScreen = document.getElementById('settingsScreen');
-        const searchScreen = document.getElementById('searchScreen');
-        const chatScreen = document.getElementById('chatScreen');
-        const onlineCountEl = document.getElementById('onlineCount');
-        const startChatBtn = document.getElementById('startChatBtn');
-        const avatarCircle = document.getElementById('avatarCircle');
-        const statusMessage = document.getElementById('statusMessage');
-        const chatControls = document.getElementById('chatControls');
-        const disconnectedActions = document.getElementById('disconnectedActions');
-        const audioIndicator = document.getElementById('audioIndicator');
-        const debugInfo = document.getElementById('debugInfo');
-
-        // Функция логирования
-        function log(message) {
-            console.log(message);
-            if (debugInfo) {
-                const time = new Date().toLocaleTimeString();
-                debugInfo.innerHTML += `[${time}] ${message}<br>`;
-                debugInfo.scrollTop = debugInfo.scrollHeight;
-            }
-        }
-
-        // Создание лепестков сакуры
-        function createSakuraPetal() {
-            const petal = document.createElement('div');
-            petal.classList.add('sakura-petal');
-            petal.style.left = Math.random() * 100 + 'vw';
-            petal.style.animation = `sakura-fall ${Math.random() * 5 + 8}s linear`;
-            petal.style.animationDelay = Math.random() * 2 + 's';
-            petal.style.opacity = Math.random() * 0.6 + 0.4;
-            document.body.appendChild(petal);
-            setTimeout(() => petal.remove(), 15000);
-        }
-
-        setInterval(createSakuraPetal, 200);
-
-        // Обновление счетчика онлайн
-        function updateOnlineCount() {
-            if (useFirebase && database) {
-                const usersRef = database.ref('users');
-                usersRef.on('value', (snapshot) => {
-                    const users = snapshot.val();
-                    onlineCountValue = users ? Object.keys(users).length : 1;
-                    onlineCountEl.textContent = onlineCountValue;
-                    log(`👥 Онлайн: ${onlineCountValue}`);
-                });
-            } else {
-                onlineCountValue = Math.floor(Math.random() * 30) + 15;
-                onlineCountEl.textContent = onlineCountValue;
-            }
-        }
-
-        updateOnlineCount();
-
-        // Выбор настроек
-        document.querySelectorAll('[data-gender]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('[data-gender]').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                myGender = this.dataset.gender;
-                checkSettings();
-            });
-        });
-
-        document.querySelectorAll('[data-looking]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('[data-looking]').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                lookingFor = this.dataset.looking;
-                checkSettings();
-            });
-        });
-
-        document.querySelectorAll('[data-age]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('[data-age]').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                myAge = this.dataset.age;
-                checkSettings();
-            });
-        });
-
-        function checkSettings() {
-            if (myGender && lookingFor && myAge) {
-                startChatBtn.disabled = false;
-            }
-        }
-
-        // Показ экранов
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        // Начало поиска
-        startChatBtn.addEventListener('click', async () => {
-            document.getElementById('searchCategory').textContent = `Вы: ${myGender === 'male' ? 'Мальчик' : 'Девочка'}, Ищете: ${lookingFor === 'male' ? 'Мальчиков' : 'Девочек'}, Возраст: ${myAge}`;
-            showScreen('searchScreen');
-            debugInfo.innerHTML = '';
-            log('🚀 Запуск поиска...');
-            await initializePeer();
-        });
-
-        // Кнопка "Меню" на экране поиска
-        document.getElementById('backFromSearchBtn').addEventListener('click', () => {
-            log('⬅️ Возврат в меню');
-            stopSearch();
-            showScreen('settingsScreen');
-        });
-
-        // Остановка поиска
-        function stopSearch() {
-            isSearching = false;
-            
-            if (searchInterval) {
-                clearInterval(searchInterval);
-                searchInterval = null;
-            }
-            
-            if (currentCall) {
-                currentCall.close();
-                currentCall = null;
-            }
-            
-            if (peer) {
-                peer.destroy();
-                peer = null;
-            }
-            
-            if (myStream) {
-                myStream.getTracks().forEach(track => track.stop());
-                myStream = null;
-            }
-            
-            if (useFirebase && database && myUserRef) {
-                myUserRef.remove();
-                myUserRef = null;
-            }
-            
-            log('🛑 Поиск остановлен');
-        }
-
-        // Инициализация PeerJS
-        async function initializePeer() {
-            try {
-                log('🎤 Запрос доступа к микрофону...');
-                
-                // Запрос доступа к микрофону
-                myStream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
-                    }, 
-                    video: false 
-                });
-                
-                log('✅ Доступ к микрофону получен');
-                
-                // Создание Peer с публичным сервером
-                log('🔗 Подключение к PeerJS серверу...');
-                peer = new Peer({
-                    config: {
-                        iceServers: [
-                            { urls: 'stun:stun.l.google.com:19302' },
-                            { urls: 'stun:stun1.l.google.com:19302' }
-                        ]
-                    }
-                });
-
-                peer.on('open', (id) => {
-                    myPeerId = id;
-                    myUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    log(`✅ PeerJS подключен! ID: ${myPeerId.substr(0, 8)}...`);
-                    registerUser();
-                    startSearching();
-                });
-
-                peer.on('call', (call) => {
-                    log(`📞 Входящий звонок от ${call.peer.substr(0, 8)}...`);
-                    call.answer(myStream);
-                    handleCall(call);
-                });
-
-                peer.on('error', (err) => {
-                    console.error('❌ Ошибка Peer:', err);
-                    log(`❌ Ошибка: ${err.type}`);
-                });
-
-                peer.on('disconnected', () => {
-                    log('🔌 Peer отключен, переподключение...');
-                    if (isSearching && peer) {
-                        peer.reconnect();
-                    }
-                });
-
-            } catch (error) {
-                console.error('❌ Ошибка доступа к микрофону:', error);
-                alert('❌ Необходим доступ к микрофону для голосового чата!\n\nРазрешите доступ в настройках браузера.');
-                showScreen('settingsScreen');
-            }
-        }
-
-        // Регистрация пользователя в базе
-        function registerUser() {
-            if (!useFirebase || !database) {
-                log('⚠️ Firebase не подключен');
-                return;
-            }
-
-            const userRef = database.ref('users/' + myUserId);
-            myUserRef = userRef;
-
-            const userData = {
-                userId: myUserId,
-                peerId: myPeerId,
-                gender: myGender,
-                lookingFor: lookingFor,
-                age: myAge,
-                status: 'searching',
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-
-            userRef.set(userData);
-            log(`📝 Зарегистрирован в БД: ${myGender} ищет ${lookingFor}, ${myAge} лет`);
-
-            // Удаление при отключении
-            userRef.onDisconnect().remove();
-        }
-
-        // Начало поиска партнера
-        function startSearching() {
-            if (!useFirebase || !database) {
-                log('⚠️ Тестовый режим - поиск симулируется');
-                setTimeout(() => {
-                    showScreen('chatScreen');
-                    statusMessage.textContent = 'Тестовый режим (без реального соединения)';
-                    chatControls.style.display = 'flex';
-                    disconnectedActions.style.display = 'none';
-                }, 3000);
-                return;
-            }
-
-            isSearching = true;
-            log('🔍 Начинаю поиск совместимого пользователя...');
-
-            const usersRef = database.ref('users');
-            
-            // Слушаем изменения в реальном времени
-            usersRef.on('child_added', checkForMatch);
-            usersRef.on('child_changed', checkForMatch);
-        }
-
-        // Проверка совпадения
-        function checkForMatch(snapshot) {
-            if (!isSearching || isConnected) return;
-
-            const userData = snapshot.val();
-            const userId = snapshot.key;
-
-            // Пропускаем себя
-            if (userId === myUserId) return;
-
-            log(`👤 Найден пользователь: ${userData.gender} ищет ${userData.lookingFor}, ${userData.age} лет, статус: ${userData.status}`);
-
-            // Проверка совместимости
-            const isCompatible = 
-                userData.status === 'searching' &&
-                userData.gender === lookingFor &&
-                userData.lookingFor === myGender;
-
-            if (isCompatible) {
-                log(`✅ СОВПАДЕНИЕ! Подключаюсь к ${userId}`);
-                
-                // Останавливаем поиск
-                const usersRef = database.ref('users');
-                usersRef.off('child_added', checkForMatch);
-                usersRef.off('child_changed', checkForMatch);
-                
-                // Обновляем статусы
-                myUserRef.update({ 
-                    status: 'connecting', 
-                    partnerId: userId,
-                    partnerPeerId: userData.peerId 
-                });
-                
-                database.ref('users/' + userId).update({ 
-                    status: 'connecting', 
-                    partnerId: myUserId,
-                    partnerPeerId: myPeerId
-                });
-                
-                // Подключаемся
-                setTimeout(() => {
-                    connectToPartner(userData.peerId);
-                }, 1000);
-            }
-        }
-
-        // Подключение к партнеру
-        function connectToPartner(partnerPeerId) {
-            log(`📞 Звоню партнеру: ${partnerPeerId.substr(0, 8)}...`);
-            
-            try {
-                const call = peer.call(partnerPeerId, myStream);
-                
-                if (!call) {
-                    log('❌ Не удалось создать звонок');
-                    handleDisconnect();
-                    return;
-                }
-                
-                handleCall(call);
-            } catch (error) {
-                console.error('❌ Ошибка звонка:', error);
-                log(`❌ Ошибка звонка: ${error.message}`);
-                handleDisconnect();
-            }
-        }
-
-        // Обработка звонка
-        function handleCall(call) {
-            currentCall = call;
-            log('📡 Звонок установлен, ожидание потока...');
-            
-            let streamReceived = false;
-            
-            call.on('stream', (remoteStream) => {
-                if (streamReceived) return;
-                streamReceived = true;
-                
-                log('✅ Удаленный поток получен!');
-                document.getElementById('remoteAudio').srcObject = remoteStream;
-                
-                isConnected = true;
-                isSearching = false;
-                
-                showScreen('chatScreen');
-                statusMessage.textContent = 'Подключено';
-                audioIndicator.style.display = 'flex';
-                chatControls.style.display = 'flex';
-                disconnectedActions.style.display = 'none';
-                
-                // Обновляем статус
-                if (useFirebase && myUserRef) {
-                    myUserRef.update({ status: 'connected' });
-                }
-            });
-
-            call.on('close', () => {
-                log('📴 Звонок завершен');
-                handleDisconnect();
-            });
-
-            call.on('error', (err) => {
-                console.error('❌ Ошибка звонка:', err);
-                log(`❌ Ошибка: ${err.type}`);
-                handleDisconnect();
-            });
-
-            // Таймаут подключения (30 секунд)
-            setTimeout(() => {
-                if (!streamReceived && currentCall === call) {
-                    log('⏱️ Таймаут подключения');
-                    handleDisconnect();
-                }
-            }, 30000);
-        }
-
-        // Обработка отключения
-        function handleDisconnect() {
-            log('🔌 Отключение...');
-            
-            isConnected = false;
-            audioIndicator.style.display = 'none';
-            chatControls.style.display = 'none';
-            disconnectedActions.style.display = 'flex';
-            statusMessage.textContent = 'Собеседник отключился';
-            
-            if (currentCall) {
-                currentCall.close();
-                currentCall = null;
-            }
-
-            if (useFirebase && database && myUserRef) {
-                myUserRef.update({ 
-                    status: 'searching', 
-                    partnerId: null,
-                    partnerPeerId: null
-                });
-            }
-        }
-
-        // Смена аватара
-        avatarCircle.addEventListener('click', () => {
-            currentAvatarIndex = (currentAvatarIndex + 1) % avatarImages.length;
-            avatarCircle.classList.add('switching');
-            
-            setTimeout(() => {
-                avatarCircle.style.backgroundImage = `url('${avatarImages[currentAvatarIndex]}')`;
-            }, 300);
-            
-            setTimeout(() => {
-                avatarCircle.classList.remove('switching');
-            }, 600);
-        });
-
-        // Кнопка Скип
-        document.getElementById('skipBtn').addEventListener('click', () => {
-            log('⏭️ Скип собеседника');
-            if (currentCall) {
-                currentCall.close();
-            }
-            handleDisconnect();
-        });
-
-        // Кнопка Мут
-        document.getElementById('muteBtn').addEventListener('click', function() {
-            if (myStream) {
-                isMuted = !isMuted;
-                myStream.getAudioTracks()[0].enabled = !isMuted;
-                
-                if (isMuted) {
-                    this.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Размутить"> Размутить';
-                    this.classList.add('muted');
-                    statusMessage.textContent = 'Вы замутились';
-                    log('🔇 Микрофон выключен');
-                } else {
-                    this.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" alt="Мут"> Мут';
-                    this.classList.remove('muted');
-                    statusMessage.textContent = 'Подключено';
-                    log('🔊 Микрофон включен');
-                }
-            }
-        });
-
-        // Искать нового
-        document.getElementById('searchNewBtn').addEventListener('click', () => {
-            log('🔍 Поиск нового собеседника...');
-            showScreen('searchScreen');
-            debugInfo.innerHTML = '';
-            isSearching = true;
-            startSearching();
-        });
-
-        // Вернуться в меню
-        document.getElementById('backToMenuBtn').addEventListener('click', () => {
-            log('⬅️ Возврат в меню');
-            stopSearch();
-            showScreen('settingsScreen');
-            
-            // Сброс настроек
-            document.querySelectorAll('.select-btn.selected').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            myGender = null;
-            lookingFor = null;
-            myAge = null;
-            startChatBtn.disabled = true;
-            isMuted = false;
-            
-            // Сброс кнопки мута
-            const muteBtn = document.getElementById('muteBtn');
-            muteBtn.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" alt="Мут"> Мут';
-            muteBtn.classList.remove('muted');
-        });
-
-        // Очистка при закрытии страницы
-        window.addEventListener('beforeunload', () => {
-            stopSearch();
-        });
-
-        // Проверка видимости вкладки
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                log('👁️ Вкладка скрыта');
-            } else {
-                log('👁️ Вкладка активна');
-                if (isSearching && peer && peer.disconnected) {
-                    peer.reconnect();
-                }
-            }
-        });
-    </script>
 </body>
 </html>
