@@ -3,306 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RUGRAM - Мессенджер</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <title>Загрузка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('https://cs12.pikabu.ru/post_img/big/2022/06/13/9/1655134620118739686.jpg') no-repeat center center fixed;
+            background-size: cover;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* Левая панель */
+        .left-panel {
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            background: rgba(11, 11, 11, 0.59);
+            padding: 3px;
+            border-radius: 10px;
+        }
+
+        .left-panel-inner {
+            background: rgba(11, 11, 11, 0.86);
+            padding: 30px;
+            border-radius: 8px;
+        }
+
+        .left-panel-inner h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .left-panel-inner p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        /* Правая верхняя панель */
+        .right-top-panel {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            width: 350px;
+            background: rgba(11, 11, 11, 0.59);
+            padding: 3px;
+            border-radius: 10px;
+        }
+
+        .right-top-panel-inner {
+            background: rgba(11, 11, 11, 0.86);
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .right-top-panel-inner h3 {
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .right-top-panel-inner p {
+            font-size: 14px;
+            color: #ddd;
+            margin-top: 10px;
+        }
+
+        /* Правая нижняя панель */
+        .right-bottom-panel {
+            position: absolute;
+            right: 30px;
+            bottom: 30px;
+            width: 350px;
+            background: rgba(11, 11, 11, 0.59);
+            padding: 3px;
+            border-radius: 10px;
+        }
+
+        .right-bottom-panel-inner {
+            background: rgba(11, 11, 11, 0.86);
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .right-bottom-panel-inner h3 {
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .right-bottom-panel-inner p {
+            font-size: 14px;
+            color: #ddd;
+            margin-top: 10px;
+        }
+
+        /* Центральная панель с названием сервера */
+        .center-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .server-name {
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        /* Круги загрузки */
+        .loading-circles {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: gray;
+        }
+
+        .circle.active {
+            background: black;
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        /* Процент загрузки */
+        .loading-text {
+            margin-top: 20px;
+            font-size: 24px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        }
+    </style>
 </head>
 <body>
-
-    <!-- ЭКРАН ЗАГРУЗКИ -->
-    <div id="splashScreen" class="splash-screen">
-        <div class="splash-content">
-            <div class="logo-animation">
-                <i class="fas fa-paper-plane"></i>
-            </div>
-            <h1 class="app-title">RUGRAM</h1>
-            <p class="app-subtitle">Безопасный мессенджер</p>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
+    <!-- Левая панель -->
+    <div class="left-panel">
+        <div class="left-panel-inner">
+            <h2>Добро пожаловать!</h2>
+            <p>Здесь вы можете написать любой текст для игроков.</p>
+            <p>Например, правила сервера или приветствие.</p>
+            <p>Этот текст можно легко изменить в коде.</p>
         </div>
     </div>
 
-    <!-- ЭКРАН АВТОРИЗАЦИИ -->
-    <div id="authScreen" class="auth-screen hidden">
+    <!-- Правая верхняя панель -->
+    <div class="right-top-panel">
+        <div class="right-top-panel-inner">
+            <h3>Информация</h3>
+            <p>Здесь может быть полезная информация о сервере.</p>
+            <p>Измените этот текст на свой.</p>
+        </div>
+    </div>
+
+    <!-- Правая нижняя панель -->
+    <div class="right-bottom-panel">
+        <div class="right-bottom-panel-inner">
+            <h3>Наши контакты</h3>
+            <p>Discord: ваш_discord</p>
+            <p>VK: ваша_группа</p>
+            <p>Сайт: ваш_сайт.ru</p>
+        </div>
+    </div>
+
+    <!-- Центральная панель -->
+    <div class="center-panel">
+        <div class="server-name">НАЗВАНИЕ ВАШЕГО СЕРВЕРА</div>
         
-        <!-- Анимированный фон -->
-        <div class="animated-bg">
-            <div class="circle circle-1"></div>
-            <div class="circle circle-2"></div>
-            <div class="circle circle-3"></div>
+        <div class="loading-circles">
+            <div class="circle" id="circle1"></div>
+            <div class="circle" id="circle2"></div>
+            <div class="circle" id="circle3"></div>
         </div>
-
-        <div class="auth-container">
-            
-            <!-- Логотип -->
-            <div class="auth-logo-wrapper">
-                <div class="auth-logo">
-                    <i class="fas fa-paper-plane"></i>
-                </div>
-                <h1 class="auth-brand">RUGRAM</h1>
-                <p class="auth-tagline">Общайся безопасно</p>
-            </div>
-
-            <!-- Переключатель форм -->
-            <div class="form-tabs">
-                <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">
-                    <i class="fas fa-sign-in-alt"></i> Вход
-                </button>
-                <button class="tab-btn" id="registerTab" onclick="switchTab('register')">
-                    <i class="fas fa-user-plus"></i> Регистрация
-                </button>
-            </div>
-
-            <!-- ФОРМА ВХОДА -->
-            <div id="loginForm" class="auth-form active">
-                <div class="form-content">
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" id="loginEmail" placeholder="Введите email" class="form-input">
-                    </div>
-                    
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock input-icon"></i>
-                        <input type="password" id="loginPassword" placeholder="Введите пароль" class="form-input">
-                        <i class="fas fa-eye toggle-icon" onclick="togglePassword('loginPassword')"></i>
-                    </div>
-
-                    <button class="submit-btn" onclick="handleLogin()">
-                        <span>Войти</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- ФОРМА РЕГИСТРАЦИИ -->
-            <div id="registerForm" class="auth-form">
-                <div class="form-content">
-                    <div class="input-wrapper">
-                        <i class="fas fa-user input-icon"></i>
-                        <input type="text" id="registerName" placeholder="Ваше имя" class="form-input">
-                    </div>
-
-                    <div class="input-wrapper">
-                        <i class="fas fa-at input-icon"></i>
-                        <input type="text" id="registerUsername" placeholder="Username (латиница)" class="form-input">
-                    </div>
-                    
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" id="registerEmail" placeholder="Email" class="form-input">
-                    </div>
-                    
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock input-icon"></i>
-                        <input type="password" id="registerPassword" placeholder="Пароль (мин. 6)" class="form-input">
-                        <i class="fas fa-eye toggle-icon" onclick="togglePassword('registerPassword')"></i>
-                    </div>
-                    
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock input-icon"></i>
-                        <input type="password" id="registerPasswordConfirm" placeholder="Повторите пароль" class="form-input">
-                    </div>
-
-                    <button class="submit-btn" onclick="handleRegister()">
-                        <span>Создать аккаунт</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ГЛАВНЫЙ ЭКРАН -->
-    <div id="mainScreen" class="main-screen hidden">
         
-        <!-- БОКОВАЯ ПАНЕЛЬ -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-brand">
-                    <i class="fas fa-paper-plane brand-icon"></i>
-                    <h2>RUGRAM</h2>
-                </div>
-                <button class="btn-icon" onclick="openNewChatDialog()">
-                    <i class="fas fa-edit"></i>
-                </button>
-            </div>
-
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchChats" placeholder="Поиск чатов...">
-            </div>
-
-            <div class="chats-list" id="chatsList">
-                <div class="empty-state">
-                    <i class="fas fa-comments"></i>
-                    <p>Нет активных чатов</p>
-                    <button class="start-chat-btn" onclick="openNewChatDialog()">
-                        <i class="fas fa-plus"></i> Начать общение
-                    </button>
-                </div>
-            </div>
-
-            <div class="sidebar-footer">
-                <div class="user-profile" onclick="openProfileDialog()">
-                    <div class="profile-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="profile-info">
-                        <h4 id="sidebarName">Загрузка...</h4>
-                        <p id="sidebarUsername">@username</p>
-                    </div>
-                    <i class="fas fa-cog settings-icon"></i>
-                </div>
-            </div>
-        </aside>
-
-        <!-- ОБЛАСТЬ ЧАТА -->
-        <main class="chat-area">
-            
-            <div id="emptyChat" class="empty-chat">
-                <div class="empty-content">
-                    <div class="empty-icon">
-                        <i class="fas fa-paper-plane"></i>
-                    </div>
-                    <h2>Добро пожаловать в RUGRAM</h2>
-                    <p>Выберите чат или начните новую переписку</p>
-                </div>
-            </div>
-
-            <div id="activeChat" class="active-chat hidden">
-                <div class="chat-header">
-                    <button class="btn-back" onclick="closeActiveChat()">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <div class="chat-user">
-                        <div class="chat-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="chat-info">
-                            <h3 id="chatName">Имя</h3>
-                            <p class="status" id="chatStatus">был(а) недавно</p>
-                        </div>
-                    </div>
-                    <div class="chat-actions">
-                        <button class="btn-icon">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button class="btn-icon">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="messages-area" id="messagesContainer">
-                    <div class="loading-messages">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Загрузка сообщений...</p>
-                    </div>
-                </div>
-
-                <div class="message-input-area">
-                    <button class="btn-icon">
-                        <i class="fas fa-paperclip"></i>
-                    </button>
-                    <div class="input-box">
-                        <textarea 
-                            id="messageInput" 
-                            placeholder="Напишите сообщение..." 
-                            rows="1"
-                            onkeydown="handleKeyPress(event)"
-                            oninput="autoResize(this)"></textarea>
-                        <button class="btn-icon">
-                            <i class="fas fa-smile"></i>
-                        </button>
-                    </div>
-                    <button class="send-btn" onclick="sendMessage()">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-
-        </main>
+        <div class="loading-text">Загрузка... <span id="percent">0%</span></div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО: НОВЫЙ ЧАТ -->
-    <div id="newChatDialog" class="modal hidden">
-        <div class="modal-overlay" onclick="closeDialog('newChatDialog')"></div>
-        <div class="modal-box">
-            <div class="modal-head">
-                <h3>Новый чат</h3>
-                <button class="close-btn" onclick="closeDialog('newChatDialog')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-content">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchUsers" placeholder="Поиск пользователя..." oninput="searchUsers(this.value)">
-                </div>
-                <div class="users-list" id="usersList">
-                    <div class="empty-state">
-                        <i class="fas fa-users"></i>
-                        <p>Введите username для поиска</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script>
+        // Анимация кругов
+        let currentCircle = 0;
+        const circles = [
+            document.getElementById('circle1'),
+            document.getElementById('circle2'),
+            document.getElementById('circle3')
+        ];
 
-    <!-- МОДАЛЬНОЕ ОКНО: ПРОФИЛЬ -->
-    <div id="profileDialog" class="modal hidden">
-        <div class="modal-overlay" onclick="closeDialog('profileDialog')"></div>
-        <div class="modal-box">
-            <div class="modal-head">
-                <h3>Мой профиль</h3>
-                <button class="close-btn" onclick="closeDialog('profileDialog')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-content profile-content">
-                <div class="profile-header">
-                    <div class="profile-avatar-large">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <button class="change-photo-btn">
-                        <i class="fas fa-camera"></i>
-                    </button>
-                </div>
-                <div class="profile-data">
-                    <div class="data-item">
-                        <label>Имя</label>
-                        <p id="profileName">Загрузка...</p>
-                    </div>
-                    <div class="data-item">
-                        <label>Username</label>
-                        <p id="profileUsername">@username</p>
-                    </div>
-                    <div class="data-item">
-                        <label>Email</label>
-                        <p id="profileEmail">email@example.com</p>
-                    </div>
-                </div>
-                <button class="logout-btn" onclick="handleLogout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Выйти из аккаунта</span>
-                </button>
-            </div>
-        </div>
-    </div>
+        function animateCircles() {
+            circles.forEach(circle => circle.classList.remove('active'));
+            circles[currentCircle].classList.add('active');
+            currentCircle = (currentCircle + 1) % 3;
+        }
 
-    <!-- УВЕДОМЛЕНИЯ -->
-    <div id="notifications" class="notifications"></div>
+        setInterval(animateCircles, 500);
 
-    <!-- FIREBASE -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+        // Симуляция загрузки (для Garry's Mod используйте реальные функции)
+        let percent = 0;
+        const percentElement = document.getElementById('percent');
 
-    <!-- APP -->
-    <script src="app.js"></script>
+        function updatePercent() {
+            if (percent < 100) {
+                percent += Math.random() * 3;
+                if (percent > 100) percent = 100;
+                percentElement.textContent = Math.floor(percent) + '%';
+            }
+        }
 
+        setInterval(updatePercent, 100);
+
+        // Для интеграции с Garry's Mod раскомментируйте:
+        /*
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+            document.querySelector('.server-name').textContent = servername;
+        }
+
+        function SetFilesNeeded(needed) {
+            // Обработка количества файлов
+        }
+
+        function SetFilesTotal(total) {
+            // Обработка общего количества файлов
+        }
+
+        function DownloadingFile(fileName) {
+            // Обработка загружаемого файла
+        }
+
+        function SetStatusChanged(status) {
+            document.querySelector('.loading-text').innerHTML = status + ' <span id="percent">' + Math.floor(percent) + '%</span>';
+        }
+        */
+    </script>
 </body>
 </html>
