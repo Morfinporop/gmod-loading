@@ -13,19 +13,33 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: url('https://cs12.pikabu.ru/post_img/big/2022/06/13/9/1655134620118739686.jpg') no-repeat center center fixed;
+            background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDCIkcArvfNwzj78fMolabdEV1yZpo4F8JiQ&s') no-repeat center center fixed;
             background-size: cover;
             overflow: hidden;
             color: white;
         }
 
-        /* Левая панель */
+        /* Blur эффект для фона */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDCIkcArvfNwzj78fMolabdEV1yZpo4F8JiQ&s') no-repeat center center fixed;
+            background-size: cover;
+            filter: blur(8px);
+            z-index: -1;
+        }
+
+        /* Левая панель на всю высоту */
         .left-panel {
             position: absolute;
             left: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 400px;
+            top: 30px;
+            bottom: 30px;
+            width: 450px;
             background: rgba(11, 11, 11, 0.59);
             padding: 3px;
             border-radius: 10px;
@@ -33,29 +47,31 @@
 
         .left-panel-inner {
             background: rgba(11, 11, 11, 0.86);
-            padding: 30px;
+            padding: 40px;
             border-radius: 8px;
+            height: 100%;
+            overflow-y: auto;
         }
 
         .left-panel-inner h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
+            font-size: 32px;
+            margin-bottom: 25px;
             color: #fff;
         }
 
         .left-panel-inner p {
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: 18px;
+            line-height: 1.8;
             color: #ddd;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
-        /* Правая верхняя панель */
+        /* Правая верхняя панель (больше) */
         .right-top-panel {
             position: absolute;
             right: 30px;
             top: 30px;
-            width: 350px;
+            width: 450px;
             background: rgba(11, 11, 11, 0.59);
             padding: 3px;
             border-radius: 10px;
@@ -63,28 +79,30 @@
 
         .right-top-panel-inner {
             background: rgba(11, 11, 11, 0.86);
-            padding: 25px;
+            padding: 35px;
             border-radius: 8px;
             text-align: center;
         }
 
         .right-top-panel-inner h3 {
-            font-size: 20px;
+            font-size: 26px;
             color: #fff;
+            margin-bottom: 15px;
         }
 
         .right-top-panel-inner p {
-            font-size: 14px;
+            font-size: 16px;
             color: #ddd;
-            margin-top: 10px;
+            margin-top: 12px;
+            line-height: 1.6;
         }
 
-        /* Правая нижняя панель */
+        /* Правая нижняя панель (больше) */
         .right-bottom-panel {
             position: absolute;
             right: 30px;
             bottom: 30px;
-            width: 350px;
+            width: 450px;
             background: rgba(11, 11, 11, 0.59);
             padding: 3px;
             border-radius: 10px;
@@ -92,20 +110,22 @@
 
         .right-bottom-panel-inner {
             background: rgba(11, 11, 11, 0.86);
-            padding: 25px;
+            padding: 35px;
             border-radius: 8px;
             text-align: center;
         }
 
         .right-bottom-panel-inner h3 {
-            font-size: 20px;
+            font-size: 26px;
             color: #fff;
+            margin-bottom: 15px;
         }
 
         .right-bottom-panel-inner p {
-            font-size: 14px;
+            font-size: 16px;
             color: #ddd;
-            margin-top: 10px;
+            margin-top: 12px;
+            line-height: 1.6;
         }
 
         /* Центральная панель с названием сервера */
@@ -118,31 +138,34 @@
         }
 
         .server-name {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: bold;
-            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8);
-            margin-bottom: 30px;
-            letter-spacing: 2px;
+            text-shadow: 4px 4px 15px rgba(0, 0, 0, 0.9);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+            color: #fff;
         }
 
-        /* Круги загрузки */
+        /* Круги загрузки (больше) */
         .loading-circles {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 25px;
         }
 
         .circle {
-            width: 20px;
-            height: 20px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             background: gray;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
         }
 
         .circle.active {
-            background: black;
+            background: red;
             animation: pulse 0.5s ease;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
         }
 
         @keyframes pulse {
@@ -150,26 +173,40 @@
                 transform: scale(1);
             }
             50% {
-                transform: scale(1.2);
+                transform: scale(1.3);
             }
         }
 
-        /* Процент загрузки */
-        .loading-text {
-            margin-top: 20px;
-            font-size: 24px;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        /* Скроллбар для левой панели */
+        .left-panel-inner::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .left-panel-inner::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .left-panel-inner::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .left-panel-inner::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
 <body>
-    <!-- Левая панель -->
+    <!-- Левая панель на всю высоту -->
     <div class="left-panel">
         <div class="left-panel-inner">
             <h2>Добро пожаловать!</h2>
             <p>Здесь вы можете написать любой текст для игроков.</p>
             <p>Например, правила сервера или приветствие.</p>
             <p>Этот текст можно легко изменить в коде.</p>
+            <p>Левая панель теперь занимает всю высоту экрана.</p>
+            <p>Вы можете добавить столько текста, сколько нужно.</p>
         </div>
     </div>
 
@@ -179,6 +216,7 @@
             <h3>Информация</h3>
             <p>Здесь может быть полезная информация о сервере.</p>
             <p>Измените этот текст на свой.</p>
+            <p>Панель стала больше для большего количества информации.</p>
         </div>
     </div>
 
@@ -189,6 +227,7 @@
             <p>Discord: ваш_discord</p>
             <p>VK: ваша_группа</p>
             <p>Сайт: ваш_сайт.ru</p>
+            <p>Telegram: ваш_телеграм</p>
         </div>
     </div>
 
@@ -201,8 +240,6 @@
             <div class="circle" id="circle2"></div>
             <div class="circle" id="circle3"></div>
         </div>
-        
-        <div class="loading-text">Загрузка... <span id="percent">0%</span></div>
     </div>
 
     <script>
@@ -221,20 +258,6 @@
         }
 
         setInterval(animateCircles, 500);
-
-        // Симуляция загрузки (для Garry's Mod используйте реальные функции)
-        let percent = 0;
-        const percentElement = document.getElementById('percent');
-
-        function updatePercent() {
-            if (percent < 100) {
-                percent += Math.random() * 3;
-                if (percent > 100) percent = 100;
-                percentElement.textContent = Math.floor(percent) + '%';
-            }
-        }
-
-        setInterval(updatePercent, 100);
 
         // Для интеграции с Garry's Mod раскомментируйте:
         /*
@@ -255,7 +278,7 @@
         }
 
         function SetStatusChanged(status) {
-            document.querySelector('.loading-text').innerHTML = status + ' <span id="percent">' + Math.floor(percent) + '%</span>';
+            // Обработка статуса загрузки
         }
         */
     </script>
