@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Загрузка сервера</title>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>Загрузка</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,13 +13,13 @@
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Russo One', sans-serif;
             height: 100vh;
             overflow: hidden;
             color: #fff;
         }
 
-        /* Фоновое изображение с blur */
+        /* Фон с blur */
         .background {
             position: fixed;
             top: 0;
@@ -27,24 +27,12 @@
             width: 100%;
             height: 100%;
             background: url('https://i.pinimg.com/originals/ec/37/b8/ec37b85fc45717273944670dc5bec424.jpg') center/cover no-repeat;
-            filter: blur(4px);
-            transform: scale(1.05);
-            z-index: -2;
-        }
-
-        /* Тёмный оверлей */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            filter: blur(3px);
             z-index: -1;
         }
 
         /* Основной контейнер */
-        .main-container {
+        .container {
             display: flex;
             height: 100vh;
             padding: 20px;
@@ -53,46 +41,27 @@
 
         /* Левая панель */
         .left-panel {
-            width: 280px;
+            width: 250px;
             height: calc(100% - 40px);
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            overflow-y: auto;
+            background: rgba(10, 20, 40, 0.75);
+            border-radius: 8px;
+            padding: 20px;
         }
 
-        .left-panel h2 {
-            font-family: 'Russo One', sans-serif;
-            font-size: 18px;
-            color: #ff6b35;
+        .left-panel h3 {
+            color: #4a9eff;
             margin-bottom: 15px;
-            border-bottom: 2px solid #ff6b35;
-            padding-bottom: 10px;
+            font-size: 16px;
         }
 
-        .left-panel .info-item {
-            margin-bottom: 12px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 5px;
-            border-left: 3px solid #ff6b35;
+        .left-panel p {
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: #ccc;
         }
 
-        .left-panel .info-item h3 {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 5px;
-        }
-
-        .left-panel .info-item p {
-            font-size: 14px;
-            color: #fff;
-        }
-
-        /* Центральный контент */
-        .center-content {
+        /* Центр */
+        .center {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -100,415 +69,136 @@
             justify-content: center;
         }
 
-        /* Логотип L/T */
-        .logo-container {
-            width: 200px;
-            height: 200px;
-            background: #000;
-            border-radius: 15px;
+        /* Логотип - квадрат */
+        .logo-box {
+            width: 180px;
+            height: 180px;
+            background: rgba(10, 20, 50, 0.8);
+            border-radius: 10px;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(255, 107, 53, 0.3);
         }
 
-        .logo-l {
+        .logo-box .l {
             position: absolute;
-            left: 25px;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            font-family: 'Russo One', sans-serif;
+            font-size: 70px;
+            color: #fff;
+        }
+
+        .logo-box .slash {
             font-size: 80px;
-            color: #ff6b35;
-            text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
-        }
-
-        .logo-slash {
-            font-family: 'Russo One', sans-serif;
-            font-size: 100px;
             color: #fff;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
-        .logo-t {
+        .logo-box .t {
             position: absolute;
-            right: 25px;
-            bottom: 20px;
-            font-family: 'Russo One', sans-serif;
-            font-size: 60px;
-            color: #ff6b35;
-            text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
-        }
-
-        /* Название сервера */
-        .server-name {
-            font-family: 'Russo One', sans-serif;
-            font-size: 42px;
+            right: 20px;
+            bottom: 15px;
+            font-size: 50px;
             color: #fff;
-            margin-top: 30px;
-            text-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
-            letter-spacing: 3px;
         }
 
-        /* Подзаголовок */
-        .subtitle {
-            font-size: 18px;
-            color: #888;
-            margin-top: 10px;
-            letter-spacing: 5px;
-            text-transform: uppercase;
+        /* Текст под логотипом */
+        .title {
+            margin-top: 25px;
+            font-size: 32px;
+            text-align: center;
         }
 
         /* Загрузка аддонов */
-        .loading-section {
-            margin-top: 40px;
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .loading-title {
-            font-size: 16px;
-            color: #ff6b35;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .loading-bar-container {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-bottom: 15px;
-        }
-
-        .loading-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #ff6b35, #ff8c5a);
-            border-radius: 3px;
-            animation: loading 3s ease-in-out infinite;
-        }
-
-        @keyframes loading {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
-        }
-
-        .loading-status {
-            font-size: 13px;
-            color: #666;
+        .loading-text {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #aaa;
         }
 
         .loading-file {
+            margin-top: 10px;
             font-size: 11px;
-            color: #444;
-            margin-top: 8px;
-            font-family: monospace;
+            color: #666;
         }
 
         /* Правая панель */
         .right-panel {
-            width: 280px;
+            width: 250px;
             height: calc(100% - 40px);
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .right-panel-top,
-        .right-panel-bottom {
+        .right-top,
+        .right-bottom {
             flex: 1;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            overflow-y: auto;
+            background: rgba(10, 20, 40, 0.75);
+            border-radius: 8px;
+            padding: 20px;
         }
 
-        .right-panel h2 {
-            font-family: 'Russo One', sans-serif;
-            font-size: 16px;
-            color: #ff6b35;
+        .right-top h3,
+        .right-bottom h3 {
+            color: #4a9eff;
             margin-bottom: 15px;
-            border-bottom: 2px solid #ff6b35;
-            padding-bottom: 10px;
+            font-size: 16px;
         }
 
-        .rules-list {
-            list-style: none;
-        }
-
-        .rules-list li {
-            font-size: 12px;
-            color: #ccc;
-            margin-bottom: 10px;
-            padding-left: 15px;
-            position: relative;
-        }
-
-        .rules-list li::before {
-            content: '▸';
-            position: absolute;
-            left: 0;
-            color: #ff6b35;
-        }
-
-        .staff-member {
-            display: flex;
-            align-items: center;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 5px;
-            margin-bottom: 8px;
-        }
-
-        .staff-avatar {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #ff6b35, #ff8c5a);
-            border-radius: 50%;
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .staff-info h4 {
+        .right-top p,
+        .right-bottom p {
             font-size: 13px;
-            color: #fff;
-        }
-
-        .staff-info span {
-            font-size: 11px;
-            color: #ff6b35;
-        }
-
-        /* Нижняя информация */
-        .footer-info {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 30px;
-            font-size: 12px;
-            color: #555;
-        }
-
-        .footer-info span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Анимации */
-        .pulse {
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* Скроллбар */
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #ff6b35;
-            border-radius: 3px;
-        }
-
-        /* Адаптивность */
-        @media (max-width: 1200px) {
-            .left-panel, .right-panel {
-                width: 220px;
-            }
-        }
-
-        @media (max-width: 900px) {
-            .left-panel, .right-panel {
-                display: none;
-            }
+            margin-bottom: 10px;
+            color: #ccc;
         }
     </style>
 </head>
 <body>
-    <!-- Фон -->
     <div class="background"></div>
-    <div class="overlay"></div>
 
-    <!-- Основной контейнер -->
-    <div class="main-container">
+    <div class="container">
         <!-- Левая панель -->
         <div class="left-panel">
-            <h2>📋 ИНФОРМАЦИЯ</h2>
-            
-            <div class="info-item">
-                <h3>СЕРВЕР</h3>
-                <p>L/T Underground RP</p>
-            </div>
-            
-            <div class="info-item">
-                <h3>РЕЖИМ</h3>
-                <p>DarkRP</p>
-            </div>
-            
-            <div class="info-item">
-                <h3>КАРТА</h3>
-                <p>rp_downtown_v4c</p>
-            </div>
-            
-            <div class="info-item">
-                <h3>ИГРОКОВ</h3>
-                <p>32 / 64</p>
-            </div>
-            
-            <div class="info-item">
-                <h3>DISCORD</h3>
-                <p>discord.gg/example</p>
-            </div>
-            
-            <div class="info-item">
-                <h3>VK</h3>
-                <p>vk.com/ltunderground</p>
-            </div>
+            <h3>ИНФОРМАЦИЯ</h3>
+            <p>Здесь твой текст</p>
+            <p>Здесь твой текст</p>
+            <p>Здесь твой текст</p>
         </div>
 
-        <!-- Центральный контент -->
-        <div class="center-content">
-            <!-- Логотип -->
-            <div class="logo-container">
-                <span class="logo-l">L</span>
-                <span class="logo-slash">/</span>
-                <span class="logo-t">T</span>
+        <!-- Центр -->
+        <div class="center">
+            <div class="logo-box">
+                <span class="l">L</span>
+                <span class="slash">/</span>
+                <span class="t">T</span>
             </div>
 
-            <!-- Название -->
-            <h1 class="server-name">ЖИВИ ПОД ЗЕМЛЁЙ</h1>
-            <p class="subtitle">Underground Roleplay</p>
+            <h1 class="title">Живи под землей</h1>
 
-            <!-- Загрузка -->
-            <div class="loading-section">
-                <p class="loading-title pulse">Загрузка аддонов...</p>
-                <div class="loading-bar-container">
-                    <div class="loading-bar"></div>
-                </div>
-                <p class="loading-status">Загружено: <span id="loaded">0</span> / <span id="total">156</span> файлов</p>
-                <p class="loading-file" id="current-file">materials/models/player/soldier.vtf</p>
-            </div>
+            <p class="loading-text">Загрузка аддонов...</p>
+            <p class="loading-file" id="file">workshop/123456.gma</p>
         </div>
 
         <!-- Правая панель -->
         <div class="right-panel">
-            <!-- Верхняя часть -->
-            <div class="right-panel-top">
-                <h2>📜 ПРАВИЛА</h2>
-                <ul class="rules-list">
-                    <li>Запрещён RDM (убийство без причины)</li>
-                    <li>Уважайте других игроков</li>
-                    <li>Не используйте читы и баги</li>
-                    <li>Следуйте указаниям администрации</li>
-                    <li>Запрещён спам в голосовом чате</li>
-                    <li>Не мешайте RP другим игрокам</li>
-                    <li>PropKill запрещён</li>
-                </ul>
+            <div class="right-top">
+                <h3>ЗАГОЛОВОК</h3>
+                <p>Здесь твой текст</p>
+                <p>Здесь твой текст</p>
             </div>
-
-            <!-- Нижняя часть -->
-            <div class="right-panel-bottom">
-                <h2>👥 АДМИНИСТРАЦИЯ</h2>
-                
-                <div class="staff-member">
-                    <div class="staff-avatar">A</div>
-                    <div class="staff-info">
-                        <h4>Admin_Name</h4>
-                        <span>Главный Админ</span>
-                    </div>
-                </div>
-                
-                <div class="staff-member">
-                    <div class="staff-avatar">M</div>
-                    <div class="staff-info">
-                        <h4>Moderator</h4>
-                        <span>Модератор</span>
-                    </div>
-                </div>
-                
-                <div class="staff-member">
-                    <div class="staff-avatar">H</div>
-                    <div class="staff-info">
-                        <h4>Helper</h4>
-                        <span>Хелпер</span>
-                    </div>
-                </div>
+            <div class="right-bottom">
+                <h3>ЗАГОЛОВОК</h3>
+                <p>Здесь твой текст</p>
+                <p>Здесь твой текст</p>
             </div>
         </div>
     </div>
 
-    <!-- Нижняя информация -->
-    <div class="footer-info">
-        <span>🌐 IP: 123.456.789.0:27015</span>
-        <span>📡 Ping: 45ms</span>
-        <span>⚡ Тикрейт: 66</span>
-    </div>
-
     <script>
-        // Симуляция загрузки
-        const files = [
-            'materials/models/player/soldier.vtf',
-            'models/weapons/w_ak47.mdl',
-            'sound/ambient/wind.wav',
-            'lua/autorun/darkrp.lua',
-            'materials/gui/hud_icons.png',
-            'models/props/door_metal.mdl',
-            'sound/voice/radio.mp3'
-        ];
-
-        let loaded = 0;
-        const total = 156;
-
-        function updateLoading() {
-            loaded++;
-            if (loaded > total) loaded = 0;
-            
-            document.getElementById('loaded').textContent = loaded;
-            document.getElementById('current-file').textContent = files[Math.floor(Math.random() * files.length)];
-        }
-
-        setInterval(updateLoading, 150);
-
-        // GMod функции
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            // Можно обновить информацию о сервере
-        }
-
-        function SetFilesTotal(total) {
-            document.getElementById('total').textContent = total;
-        }
-
-        function SetFilesNeeded(needed) {
-            document.getElementById('loaded').textContent = 
-                parseInt(document.getElementById('total').textContent) - needed;
-        }
-
         function DownloadingFile(fileName) {
-            document.getElementById('current-file').textContent = fileName;
+            document.getElementById('file').textContent = fileName;
         }
     </script>
 </body>
