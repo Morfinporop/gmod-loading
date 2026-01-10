@@ -3,1140 +3,513 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ЛЕГЕНДА СКВАДА - 2025</title>
+    <title>Загрузка сервера</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700;900&family=Russo+One&display=swap');
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --neon-cyan: #00f0ff;
-            --neon-purple: #b026ff;
-            --neon-pink: #ff0080;
-            --neon-green: #39ff14;
-            --dark-bg: #0a0a0f;
-            --panel-bg: #13131a;
-        }
-
         body {
-            font-family: 'Russo One', sans-serif;
-            background: var(--dark-bg);
+            font-family: 'Roboto', sans-serif;
+            height: 100vh;
+            overflow: hidden;
             color: #fff;
-            overflow-x: hidden;
         }
 
-        .animated-bg {
+        /* Фоновое изображение с blur */
+        .background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(176, 38, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(255, 0, 128, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-            animation: bg-shift 20s ease infinite;
+            background: url('https://i.pinimg.com/originals/ec/37/b8/ec37b85fc45717273944670dc5bec424.jpg') center/cover no-repeat;
+            filter: blur(4px);
+            transform: scale(1.05);
+            z-index: -2;
         }
 
-        @keyframes bg-shift {
+        /* Тёмный оверлей */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        /* Основной контейнер */
+        .main-container {
+            display: flex;
+            height: 100vh;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Левая панель */
+        .left-panel {
+            width: 280px;
+            height: calc(100% - 40px);
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .left-panel h2 {
+            font-family: 'Russo One', sans-serif;
+            font-size: 18px;
+            color: #ff6b35;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ff6b35;
+            padding-bottom: 10px;
+        }
+
+        .left-panel .info-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 3px solid #ff6b35;
+        }
+
+        .left-panel .info-item h3 {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .left-panel .info-item p {
+            font-size: 14px;
+            color: #fff;
+        }
+
+        /* Центральный контент */
+        .center-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Логотип L/T */
+        .logo-container {
+            width: 200px;
+            height: 200px;
+            background: #000;
+            border-radius: 15px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+        }
+
+        .logo-l {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Russo One', sans-serif;
+            font-size: 80px;
+            color: #ff6b35;
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+
+        .logo-slash {
+            font-family: 'Russo One', sans-serif;
+            font-size: 100px;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .logo-t {
+            position: absolute;
+            right: 25px;
+            bottom: 20px;
+            font-family: 'Russo One', sans-serif;
+            font-size: 60px;
+            color: #ff6b35;
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+
+        /* Название сервера */
+        .server-name {
+            font-family: 'Russo One', sans-serif;
+            font-size: 42px;
+            color: #fff;
+            margin-top: 30px;
+            text-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+            letter-spacing: 3px;
+        }
+
+        /* Подзаголовок */
+        .subtitle {
+            font-size: 18px;
+            color: #888;
+            margin-top: 10px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        /* Загрузка аддонов */
+        .loading-section {
+            margin-top: 40px;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .loading-title {
+            font-size: 16px;
+            color: #ff6b35;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .loading-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff6b35, #ff8c5a);
+            border-radius: 3px;
+            animation: loading 3s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        .loading-status {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .loading-file {
+            font-size: 11px;
+            color: #444;
+            margin-top: 8px;
+            font-family: monospace;
+        }
+
+        /* Правая панель */
+        .right-panel {
+            width: 280px;
+            height: calc(100% - 40px);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .right-panel-top,
+        .right-panel-bottom {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .right-panel h2 {
+            font-family: 'Russo One', sans-serif;
+            font-size: 16px;
+            color: #ff6b35;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ff6b35;
+            padding-bottom: 10px;
+        }
+
+        .rules-list {
+            list-style: none;
+        }
+
+        .rules-list li {
+            font-size: 12px;
+            color: #ccc;
+            margin-bottom: 10px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .rules-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #ff6b35;
+        }
+
+        .staff-member {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        .staff-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .staff-info h4 {
+            font-size: 13px;
+            color: #fff;
+        }
+
+        .staff-info span {
+            font-size: 11px;
+            color: #ff6b35;
+        }
+
+        /* Нижняя информация */
+        .footer-info {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .footer-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Анимации */
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
 
-        .snowflakes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            overflow: hidden;
+        /* Скроллбар */
+        ::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .snowflake {
-            position: absolute;
-            top: -10px;
-            color: var(--neon-cyan);
-            font-size: 1.2em;
-            animation: fall linear infinite;
-            text-shadow: 0 0 10px var(--neon-cyan);
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
         }
 
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
+        ::-webkit-scrollbar-thumb {
+            background: #ff6b35;
+            border-radius: 3px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1200px) {
+            .left-panel, .right-panel {
+                width: 220px;
             }
         }
 
-        /* Прогресс */
-        .progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
-            width: 0%;
-            z-index: 1000;
-            box-shadow: 0 0 20px var(--neon-cyan);
-            transition: width 0.3s ease;
-        }
-
-        /* Навигация */
-        .nav-dots {
-            position: fixed;
-            right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .nav-dot {
-            width: 14px;
-            height: 14px;
-            border: 2px solid var(--neon-cyan);
-            background: transparent;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-        }
-
-        .nav-dot.active {
-            background: var(--neon-cyan);
-            box-shadow: 0 0 20px var(--neon-cyan);
-            transform: scale(1.5);
-        }
-
-        .nav-dot:hover {
-            transform: scale(1.3);
-            box-shadow: 0 0 15px var(--neon-cyan);
-        }
-
-        /* Контейнер */
-        .story-container {
-            height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
-            scrollbar-width: none;
-            position: relative;
-            z-index: 2;
-        }
-
-        .story-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Страница */
-        .page {
-            min-height: 100vh;
-            scroll-snap-align: start;
-            padding: 80px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease;
-        }
-
-        .page.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* ОБЛОЖКА */
-        .cover {
-            flex-direction: column;
-            text-align: center;
-            background: radial-gradient(ellipse at center, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
-        }
-
-        .cover-title {
-            font-family: 'Bangers', cursive;
-            font-size: clamp(4rem, 15vw, 12rem);
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 80px rgba(0, 240, 255, 0.5);
-            margin-bottom: 20px;
-            animation: glow-pulse 3s ease-in-out infinite;
-            letter-spacing: 10px;
-        }
-
-        @keyframes glow-pulse {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.3); }
-        }
-
-        .cover-subtitle {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1.5rem, 4vw, 3rem);
-            color: var(--neon-cyan);
-            text-shadow: 0 0 20px var(--neon-cyan);
-            margin-bottom: 30px;
-            letter-spacing: 5px;
-        }
-
-        .cover-year {
-            font-family: 'Bangers', cursive;
-            font-size: clamp(3rem, 8vw, 6rem);
-            color: var(--neon-pink);
-            text-shadow: 0 0 30px var(--neon-pink);
-            margin-bottom: 60px;
-        }
-
-        .scroll-hint {
-            position: absolute;
-            bottom: 40px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            animation: bounce 2s infinite;
-            letter-spacing: 3px;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        /* КОМИКС ПАНЕЛИ */
-        .comic-panel {
-            max-width: 1400px;
-            width: 100%;
-            background: var(--panel-bg);
-            border: 4px solid;
-            border-image: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)) 1;
-            box-shadow: 
-                0 0 40px rgba(0, 240, 255, 0.3),
-                inset 0 0 40px rgba(0, 240, 255, 0.05);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-        }
-
-        .comic-panel:hover {
-            transform: scale(1.02);
-            box-shadow: 
-                0 0 60px rgba(0, 240, 255, 0.5),
-                inset 0 0 60px rgba(0, 240, 255, 0.1);
-        }
-
-        /* Номер главы */
-        .chapter-badge {
-            position: absolute;
-            top: -15px;
-            left: 40px;
-            background: var(--neon-purple);
-            color: #000;
-            font-family: 'Bangers', cursive;
-            font-size: 28px;
-            padding: 10px 30px;
-            border: 3px solid var(--neon-cyan);
-            box-shadow: 0 0 30px var(--neon-purple);
-            z-index: 10;
-            letter-spacing: 3px;
-        }
-
-        /* Макет 1: Горизонтальный */
-        .layout-horizontal {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: 600px;
-        }
-
-        .panel-left,
-        .panel-right {
-            padding: 60px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .panel-left {
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), transparent);
-            border-right: 2px solid rgba(0, 240, 255, 0.2);
-        }
-
-        .panel-right {
-            background: linear-gradient(135deg, transparent, rgba(176, 38, 255, 0.05));
-        }
-
-        /* Макет 2: Вертикальный */
-        .layout-vertical {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel-top,
-        .panel-bottom {
-            padding: 50px 60px;
-        }
-
-        .panel-top {
-            background: linear-gradient(180deg, rgba(0, 240, 255, 0.08), transparent);
-            border-bottom: 2px solid rgba(0, 240, 255, 0.2);
-        }
-
-        .panel-bottom {
-            background: linear-gradient(180deg, transparent, rgba(176, 38, 255, 0.08));
-        }
-
-        /* Макет 3: Центрированный */
-        .layout-center {
-            padding: 80px;
-            text-align: center;
-        }
-
-        /* Заголовок панели */
-        .panel-title {
-            font-family: 'Bangers', cursive;
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            color: var(--neon-cyan);
-            text-shadow: 0 0 20px var(--neon-cyan);
-            margin-bottom: 25px;
-            line-height: 1.2;
-            letter-spacing: 3px;
-        }
-
-        /* Текст панели */
-        .panel-text {
-            font-family: 'Russo One', sans-serif;
-            font-size: 18px;
-            line-height: 1.9;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 20px;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Аватар персонажа */
-        .character-avatar {
-            width: 100%;
-            max-width: 400px;
-            aspect-ratio: 1;
-            margin: 0 auto 30px;
-            border: 4px solid var(--neon-cyan);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 
-                0 0 40px rgba(0, 240, 255, 0.6),
-                inset 0 0 40px rgba(0, 240, 255, 0.1);
-            position: relative;
-            transition: all 0.4s ease;
-        }
-
-        .character-avatar:hover {
-            transform: scale(1.05) rotate(2deg);
-            box-shadow: 
-                0 0 60px rgba(0, 240, 255, 0.8),
-                inset 0 0 60px rgba(0, 240, 255, 0.2);
-        }
-
-        .character-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(1.1) contrast(1.2);
-        }
-
-        .character-avatar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .character-avatar:hover::before {
-            left: 100%;
-        }
-
-        /* Имя персонажа */
-        .character-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 32px;
-            font-weight: 900;
-            color: var(--neon-purple);
-            text-shadow: 0 0 20px var(--neon-purple);
-            margin-bottom: 15px;
-            letter-spacing: 3px;
-        }
-
-        /* Речевой пузырь */
-        .speech-bubble {
-            background: rgba(0, 240, 255, 0.15);
-            border: 3px solid var(--neon-cyan);
-            border-radius: 25px;
-            padding: 20px 30px;
-            margin: 20px 0;
-            position: relative;
-            font-family: 'Russo One', sans-serif;
-            font-size: 20px;
-            line-height: 1.6;
-            color: #fff;
-            box-shadow: 
-                0 0 30px rgba(0, 240, 255, 0.3),
-                inset 0 0 30px rgba(0, 240, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .speech-bubble:hover {
-            transform: translateX(10px);
-            box-shadow: 
-                0 0 40px rgba(0, 240, 255, 0.5),
-                inset 0 0 40px rgba(0, 240, 255, 0.15);
-        }
-
-        .speech-bubble::before {
-            content: '';
-            position: absolute;
-            left: -20px;
-            top: 30px;
-            width: 0;
-            height: 0;
-            border-top: 15px solid transparent;
-            border-bottom: 15px solid transparent;
-            border-right: 20px solid var(--neon-cyan);
-            filter: drop-shadow(0 0 10px var(--neon-cyan));
-        }
-
-        .speech-bubble.right {
-            background: rgba(176, 38, 255, 0.15);
-            border-color: var(--neon-purple);
-            box-shadow: 
-                0 0 30px rgba(176, 38, 255, 0.3),
-                inset 0 0 30px rgba(176, 38, 255, 0.1);
-        }
-
-        .speech-bubble.right:hover {
-            box-shadow: 
-                0 0 40px rgba(176, 38, 255, 0.5),
-                inset 0 0 40px rgba(176, 38, 255, 0.15);
-        }
-
-        .speech-bubble.right::before {
-            left: auto;
-            right: -20px;
-            border-right: none;
-            border-left: 20px solid var(--neon-purple);
-            filter: drop-shadow(0 0 10px var(--neon-purple));
-        }
-
-        .speech-bubble.angry {
-            background: rgba(255, 0, 128, 0.2);
-            border-color: var(--neon-pink);
-            animation: shake 0.5s ease infinite;
-            font-weight: bold;
-            box-shadow: 
-                0 0 30px rgba(255, 0, 128, 0.4),
-                inset 0 0 30px rgba(255, 0, 128, 0.1);
-        }
-
-        .speech-bubble.angry::before {
-            border-right-color: var(--neon-pink);
-            filter: drop-shadow(0 0 10px var(--neon-pink));
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: rotate(-1deg); }
-            50% { transform: rotate(1deg); }
-        }
-
-        /* Звуковой эффект */
-        .sound-fx {
-            font-family: 'Bangers', cursive;
-            font-size: clamp(3rem, 8vw, 6rem);
-            color: var(--neon-pink);
-            text-shadow: 
-                0 0 30px var(--neon-pink),
-                3px 3px 0 rgba(0, 0, 0, 0.5);
-            position: absolute;
-            animation: fx-pulse 1s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 5;
-            letter-spacing: 5px;
-        }
-
-        @keyframes fx-pulse {
-            0%, 100% { transform: scale(1) rotate(-5deg); opacity: 1; }
-            50% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
-        }
-
-        /* Теги */
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 30px;
-        }
-
-        .tag {
-            background: transparent;
-            border: 2px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            text-shadow: 0 0 10px var(--neon-cyan);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-            transition: all 0.3s ease;
-            letter-spacing: 1px;
-        }
-
-        .tag:hover {
-            background: var(--neon-cyan);
-            color: #000;
-            transform: translateY(-3px);
-            box-shadow: 0 0 30px var(--neon-cyan);
-        }
-
-        /* СТРАНИЦА КОМАНДЫ */
-        .team-page {
-            background: radial-gradient(ellipse at center, rgba(176, 38, 255, 0.15) 0%, transparent 70%);
-        }
-
-        .team-grid {
-            max-width: 1400px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
-            padding: 40px;
-        }
-
-        .hero-card {
-            background: var(--panel-bg);
-            border: 3px solid var(--neon-purple);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 
-                0 0 40px rgba(176, 38, 255, 0.4),
-                inset 0 0 40px rgba(176, 38, 255, 0.05);
-            transition: all 0.4s ease;
-            position: relative;
-        }
-
-        .hero-card:hover {
-            transform: translateY(-15px);
-            box-shadow: 
-                0 0 60px rgba(176, 38, 255, 0.6),
-                inset 0 0 60px rgba(176, 38, 255, 0.1);
-        }
-
-        .hero-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(176, 38, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.6s ease;
-        }
-
-        .hero-card:hover::before {
-            left: 100%;
-        }
-
-        .hero-avatar-wrapper {
-            width: 100%;
-            height: 350px;
-            overflow: hidden;
-            position: relative;
-            border-bottom: 3px solid var(--neon-purple);
-        }
-
-        .hero-avatar-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-            filter: brightness(1.1);
-        }
-
-        .hero-card:hover .hero-avatar-wrapper img {
-            transform: scale(1.15);
-        }
-
-        .hero-role-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--neon-cyan);
-            color: #000;
-            font-family: 'Bangers', cursive;
-            font-size: 20px;
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 30px var(--neon-cyan);
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-
-        .hero-info {
-            padding: 35px;
-            text-align: center;
-        }
-
-        .hero-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 32px;
-            font-weight: 900;
-            color: var(--neon-purple);
-            text-shadow: 0 0 20px var(--neon-purple);
-            margin-bottom: 10px;
-            letter-spacing: 3px;
-        }
-
-        .hero-title {
-            font-family: 'Russo One', sans-serif;
-            font-size: 16px;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-        }
-
-        .hero-desc {
-            font-family: 'Russo One', sans-serif;
-            font-size: 14px;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* ФИНАЛ */
-        .finale {
-            background: radial-gradient(ellipse at center, rgba(255, 0, 128, 0.2) 0%, transparent 70%);
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .finale-icon {
-            font-size: 10rem;
-            margin-bottom: 40px;
-            animation: float 3s ease-in-out infinite;
-            filter: drop-shadow(0 0 40px var(--neon-pink));
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-25px) rotate(10deg); }
-        }
-
-        .finale-title {
-            font-family: 'Bangers', cursive;
-            font-size: clamp(3rem, 8vw, 6rem);
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 60px rgba(0, 240, 255, 0.5);
-            margin-bottom: 40px;
-            letter-spacing: 5px;
-        }
-
-        .finale-text {
-            max-width: 900px;
-            font-family: 'Russo One', sans-serif;
-            font-size: clamp(1.1rem, 2.5vw, 1.6rem);
-            line-height: 2;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 30px;
-        }
-
-        .finale-signature {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            color: var(--neon-pink);
-            text-shadow: 0 0 30px var(--neon-pink);
-            margin-top: 40px;
-            letter-spacing: 3px;
-        }
-
-        /* Адаптив */
-        @media (max-width: 968px) {
-            .layout-horizontal {
-                grid-template-columns: 1fr;
-            }
-
-            .panel-left {
-                border-right: none;
-                border-bottom: 2px solid rgba(0, 240, 255, 0.2);
-            }
-
-            .team-grid {
-                grid-template-columns: 1fr;
-                gap: 30px;
-                padding: 20px;
-            }
-
-            .nav-dots {
-                right: 15px;
-                gap: 12px;
-            }
-
-            .page {
-                padding: 60px 20px;
-            }
-
-            .panel-left,
-            .panel-right,
-            .panel-top,
-            .panel-bottom,
-            .layout-center {
-                padding: 40px 30px;
-            }
-
-            .character-avatar {
-                max-width: 280px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .speech-bubble {
-                font-size: 16px;
-                padding: 15px 20px;
-            }
-
-            .sound-fx {
-                font-size: 2.5rem;
+        @media (max-width: 900px) {
+            .left-panel, .right-panel {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-
     <!-- Фон -->
-    <div class="animated-bg"></div>
+    <div class="background"></div>
+    <div class="overlay"></div>
 
-    <!-- Снежинки -->
-    <div class="snowflakes" id="snowflakes"></div>
+    <!-- Основной контейнер -->
+    <div class="main-container">
+        <!-- Левая панель -->
+        <div class="left-panel">
+            <h2>📋 ИНФОРМАЦИЯ</h2>
+            
+            <div class="info-item">
+                <h3>СЕРВЕР</h3>
+                <p>L/T Underground RP</p>
+            </div>
+            
+            <div class="info-item">
+                <h3>РЕЖИМ</h3>
+                <p>DarkRP</p>
+            </div>
+            
+            <div class="info-item">
+                <h3>КАРТА</h3>
+                <p>rp_downtown_v4c</p>
+            </div>
+            
+            <div class="info-item">
+                <h3>ИГРОКОВ</h3>
+                <p>32 / 64</p>
+            </div>
+            
+            <div class="info-item">
+                <h3>DISCORD</h3>
+                <p>discord.gg/example</p>
+            </div>
+            
+            <div class="info-item">
+                <h3>VK</h3>
+                <p>vk.com/ltunderground</p>
+            </div>
+        </div>
 
-    <!-- Прогресс -->
-    <div class="progress-bar" id="progressBar"></div>
+        <!-- Центральный контент -->
+        <div class="center-content">
+            <!-- Логотип -->
+            <div class="logo-container">
+                <span class="logo-l">L</span>
+                <span class="logo-slash">/</span>
+                <span class="logo-t">T</span>
+            </div>
 
-    <!-- Навигация -->
-    <div class="nav-dots" id="navDots"></div>
+            <!-- Название -->
+            <h1 class="server-name">ЖИВИ ПОД ЗЕМЛЁЙ</h1>
+            <p class="subtitle">Underground Roleplay</p>
 
-    <!-- История -->
-    <div class="story-container" id="storyContainer">
-
-        <!-- ОБЛОЖКА -->
-        <section class="page cover visible">
-            <h1 class="cover-title">ЛЕГЕНДА СКВАДА</h1>
-            <p class="cover-subtitle">ИСТОРИЯ ЧЕТЫРЁХ ВОИНОВ</p>
-            <div class="cover-year">2025</div>
-            <div class="scroll-hint">↓ ЛИСТАЙ ВНИЗ ↓</div>
-        </section>
-
-        <!-- ГЛАВА 1: ПЕРВАЯ ВСТРЕЧА -->
-        <section class="page">
-            <div class="comic-panel layout-horizontal">
-                <div class="chapter-badge">ГЛАВА 1</div>
-                <div class="panel-left">
-                    <div class="character-avatar">
-                        <img src="https://yt3.googleusercontent.com/ytc/AIdro_mJCzk3Sq7YD7LiOVf6RQtzt964xwPjYN6cv2vJlzfUv8-Y=s900-c-k-c0x00ffffff-no-rj" alt="chebuzavric14">
-                    </div>
-                    <div class="character-name">CHEBUZAVRIC14</div>
+            <!-- Загрузка -->
+            <div class="loading-section">
+                <p class="loading-title pulse">Загрузка аддонов...</p>
+                <div class="loading-bar-container">
+                    <div class="loading-bar"></div>
                 </div>
-                <div class="panel-right">
-                    <div class="sound-fx" style="top: 20px; right: 30px;">PING!</div>
-                    <h2 class="panel-title">НАЧАЛО В ДИСКОРДЕ</h2>
-                    <p class="panel-text">
-                        Обычный день. Случайный сервер Minecraft в Discord. 
-                        Но судьба решила по-другому...
-                    </p>
-                    <div class="speech-bubble">
-                        "А пошли в лс!"
+                <p class="loading-status">Загружено: <span id="loaded">0</span> / <span id="total">156</span> файлов</p>
+                <p class="loading-file" id="current-file">materials/models/player/soldier.vtf</p>
+            </div>
+        </div>
+
+        <!-- Правая панель -->
+        <div class="right-panel">
+            <!-- Верхняя часть -->
+            <div class="right-panel-top">
+                <h2>📜 ПРАВИЛА</h2>
+                <ul class="rules-list">
+                    <li>Запрещён RDM (убийство без причины)</li>
+                    <li>Уважайте других игроков</li>
+                    <li>Не используйте читы и баги</li>
+                    <li>Следуйте указаниям администрации</li>
+                    <li>Запрещён спам в голосовом чате</li>
+                    <li>Не мешайте RP другим игрокам</li>
+                    <li>PropKill запрещён</li>
+                </ul>
+            </div>
+
+            <!-- Нижняя часть -->
+            <div class="right-panel-bottom">
+                <h2>👥 АДМИНИСТРАЦИЯ</h2>
+                
+                <div class="staff-member">
+                    <div class="staff-avatar">A</div>
+                    <div class="staff-info">
+                        <h4>Admin_Name</h4>
+                        <span>Главный Админ</span>
                     </div>
-                    <p class="panel-text">
-                        <strong style="color: var(--neon-cyan);">chebuzavric14</strong> — 
-                        человек, с которого всё началось. Тот самый голос в Discord, 
-                        который изменил всё.
-                    </p>
-                    <div class="tags">
-                        <span class="tag">#НАЧАЛО</span>
-                        <span class="tag">#DISCORD</span>
-                        <span class="tag">#MINECRAFT</span>
+                </div>
+                
+                <div class="staff-member">
+                    <div class="staff-avatar">M</div>
+                    <div class="staff-info">
+                        <h4>Moderator</h4>
+                        <span>Модератор</span>
+                    </div>
+                </div>
+                
+                <div class="staff-member">
+                    <div class="staff-avatar">H</div>
+                    <div class="staff-info">
+                        <h4>Helper</h4>
+                        <span>Хелпер</span>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </div>
 
-        <!-- ГЛАВА 2: GAM1R -->
-        <section class="page">
-            <div class="comic-panel layout-horizontal">
-                <div class="chapter-badge">ГЛАВА 2</div>
-                <div class="panel-left">
-                    <h2 class="panel-title">ЗНАКОМСТВО С GAM1R</h2>
-                    <p class="panel-text">
-                        Чебузаврик решает добавить в группу с gam1r...
-                    </p>
-                    <div class="speech-bubble">
-                        "Э, вот это gam1r, его надо булить..."
-                    </div>
-                    <div class="speech-bubble right">
-                        "Привет morfa..."
-                    </div>
-                    <div class="speech-bubble angry">
-                        "Да пошел ты нахуй твою мать еб№;"
-                    </div>
-                    <p class="panel-text">
-                        Я начал его оскорблять...
-                        Ему это явно не нравилось.
-                    </p>
-                    <div class="tags">
-                        <span class="tag">#КОНФЛИКТ</span>
-                        <span class="tag">#ПЕРВАЯ_ВСТРЕЧА</span>
-                        <span class="tag">#ДРАМА</span>
-                    </div>
-                </div>
-                <div class="panel-right">
-                    <div class="character-avatar">
-                        <img src="https://i.pinimg.com/originals/41/3f/56/413f5605cfccf212cb0e49444b233d59.jpg" alt="gam1r">
-                    </div>
-                    <div class="character-name">GAM1R</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ГЛАВА 3: ПРИМИРЕНИЕ -->
-        <section class="page">
-            <div class="comic-panel layout-vertical">
-                <div class="chapter-badge">ГЛАВА 3</div>
-                <div class="panel-top">
-                    <div class="sound-fx" style="top: 30px; right: 50px; color: var(--neon-green);">PEACE!</div>
-                    <h2 class="panel-title">НЕОЖИДАННЫЙ ПОВОРОТ</h2>
-                    <p class="panel-text">
-                        Прошло несколько дней... Мы продолжали играть. 
-                        Сначала не интересно. Потом начали угарать друг с друга. 
-                        Потом было очень смешно и атмосферно!
-                    </p>
-                </div>
-                <div class="panel-bottom">
-                    <div class="speech-bubble">
-                        "(Morfa) Бля ебать с вами весело"
-                    </div>
-                    <div class="speech-bubble right">
-                        "(chebuzavric14) - а я че говорил"
-                    </div>
-                    <p class="panel-text" style="text-align: center; font-size: 22px; color: var(--neon-cyan); margin-top: 30px;">
-                        Так <strong>gam1r</strong> был иконой оскарблений и смеха. 
-                        Именно так рождаются легендарные дружбы!
-                    </p>
-                    <div class="tags" style="justify-content: center;">
-                        <span class="tag">#ОСТАЛСЯ</span>
-                        <span class="tag">#ДРУЗЬЯ</span>
-                        <span class="tag">#НОВАЯ_ЭПОХА</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ГЛАВА 4: MORFA -->
-        <section class="page">
-            <div class="comic-panel layout-horizontal">
-                <div class="chapter-badge">ГЛАВА 4</div>
-                <div class="panel-left">
-                    <div class="character-avatar">
-                        <img src="https://i.ytimg.com/vi/8GKf5eNX86w/hqdefault.jpg" alt="Morfa">
-                    </div>
-                    <div class="character-name">MORFA</div>
-                </div>
-                <div class="panel-right">
-                    <h2 class="panel-title">ПОЯВЛЕНИЕ В ПАЧКЕ</h2>
-                    <p class="panel-text">
-                        Весна 2025. наш уютный Discord заходит новый участник. 
-                        Ник: <strong style="color: var(--neon-purple);">Morfa</strong>.
-                    </p>
-                    <div class="speech-bubble">
-                        "Здорова пацаны нахуй"
-                    </div>
-                    <div class="speech-bubble right">
-                        "(Pixeled) ну и еблан тупой"
-                    </div>
-                    <p class="panel-text">
-                        Первая игра была cristalix. 
-                        я не понимал что это и как играть!
-                    </p>
-                    <div class="tags">
-                        <span class="tag">#MORFA</span>
-                        <span class="tag">#CRISTALIX</span>
-                        <span class="tag">#ЛЕГЕНДА</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ГЛАВА 5: PIXELED -->
-        <section class="page">
-            <div class="comic-panel layout-horizontal">
-                <div class="chapter-badge">ГЛАВА 5</div>
-                <div class="panel-left">
-                    <h2 class="panel-title">НЕДОБРОЖЕЛАТЕЛЬ</h2>
-                    <p class="panel-text">
-                        Лето 2025. вроде норм...
-                    </p>
-                    <div class="speech-bubble">
-                        "мы играли с кайфом"
-                    </div>
-                    <div class="speech-bubble right">
-                        "мы играли только в норм игры"
-                    </div>
-                    <div class="speech-bubble angry" style="background: rgba(57, 255, 20, 0.2); border-color: var(--neon-green); animation: none;">
-                        "с кайфом тима"
-                    </div>
-                    <p class="panel-text" style="font-size: 20px; color: var(--neon-cyan); margin-top: 20px;">
-                        КОМАНДА СОБРАНА! Четыре воина. Одна непобедимая сила!
-                    </p>
-                    <div class="tags">
-                        <span class="tag">#PIXELED</span>
-                        <span class="tag">#РАД</span>
-                        <span class="tag">#КОМАНДА_ГОТОВА</span>
-                    </div>
-                </div>
-                <div class="panel-right">
-                    <div class="character-avatar">
-                        <img src="https://yt3.googleusercontent.com/b_aUblThh-aPH1_HvEjGXxvfPe9TjsLNJEbBisB2trJKNX6JJUz8hy0pzJcKmMgIFZkoIgug5g=s900-c-k-c0x00ffffff-no-rj" alt="pixeled">
-                    </div>
-                    <div class="character-name">PIXELED</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ГЛАВА 6: ЭПИЧНЫЕ МОМЕНТЫ -->
-        <section class="page">
-            <div class="comic-panel layout-center">
-                <div class="chapter-badge">ГЛАВА 6</div>
-                <h2 class="panel-title">ЛЕТО 2025: ЭПИЧНЫЕ МОМЕНТЫ</h2>
-                <p class="panel-text" style="max-width: 800px; margin: 0 auto 30px;">
-                    Ночные марафоны до рассвета.
-                    Сотни часов смеха и безумия.
-                </p>
-                <div class="speech-bubble" style="max-width: 600px; margin: 20px auto;">
-                    "все я спать, уже 6 утра..."
-                </div>
-                <div class="speech-bubble right" style="max-width: 600px; margin: 20px auto;">
-                    "Окей, или го еще чучуть"
-                </div>
-                <p class="panel-text" style="font-size: 24px; color: var(--neon-pink); margin: 40px auto;">
-                    *Просыпаемся в час ночи* 
-                </p>
-                <p class="panel-text" style="max-width: 800px; margin: 30px auto;">
-                    Каждый момент с вами бесценен.
-                </p>
-                <div class="tags" style="justify-content: center;">
-                    <span class="tag">#БЕСОННИЦА</span>
-                    <span class="tag">#ДО_УТРА</span>
-                    <span class="tag">#ИМБА</span>
-                    <span class="tag">#ВОСПОМИНАНИЯ</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- КОМАНДА -->
-        <section class="page team-page">
-            <div style="text-align: center; margin-bottom: 60px;">
-                <h2 class="cover-title" style="font-size: clamp(3rem, 8vw, 6rem); margin-bottom: 20px;">
-                    НАШИ ТИГРЫ
-                </h2>
-                <p style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-purple); text-shadow: 0 0 20px var(--neon-purple);">
-                    Четыре воина. Одна легенда.
-                </p>
-            </div>
-            <div class="team-grid">
-                <div class="hero-card">
-                    <div class="hero-avatar-wrapper">
-                        <img src="https://i.ytimg.com/vi/8GKf5eNX86w/hqdefault.jpg" alt="Morfa">
-                        <div class="hero-role-badge">ДОБРЫЙ</div>
-                    </div>
-                    <div class="hero-info">
-                        <h3 class="hero-name">MORFA</h3>
-                        <p class="hero-title">отзывчивый</p>
-                        <p class="hero-desc">
-                            Всегда пытался спасти со всеми отношение и помирить всех
-                            был душой компании!!
-                        </p>
-                    </div>
-                </div>
-
-                <div class="hero-card">
-                    <div class="hero-avatar-wrapper">
-                        <img src="https://i.pinimg.com/originals/41/3f/56/413f5605cfccf212cb0e49444b233d59.jpg" alt="gam1r">
-                        <div class="hero-role-badge">УМНЫЙ</div>
-                    </div>
-                    <div class="hero-info">
-                        <h3 class="hero-name">GAM1R</h3>
-                        <p class="hero-title">БОТАНИК/САМОУЧКА</p>
-                        <p class="hero-desc">
-                            От врага до друга! самый умный/иногда тупой. 
-                            его папка дает контенту
-                        </p>
-                    </div>
-                </div>
-
-                <div class="hero-card">
-                    <div class="hero-avatar-wrapper">
-                        <img src="https://yt3.googleusercontent.com/ytc/AIdro_mJCzk3Sq7YD7LiOVf6RQtzt964xwPjYN6cv2vJlzfUv8-Y=s900-c-k-c0x00ffffff-no-rj" alt="chebuzavric14">
-                        <div class="hero-role-badge">МОЗГ(почти)</div>
-                    </div>
-                    <div class="hero-info">
-                        <h3 class="hero-name">CHEBUZAVRIC14</h3>
-                        <p class="hero-title">СОЗДАТЕЛЬ ПАЧКИ</p>
-                        <p class="hero-desc">
-                            Тот, с кого всё началось. Собрал нас на том Minecraft сервере. 
-                            познакомил добавил!
-                        </p>
-                    </div>
-                </div>
-
-                <div class="hero-card">
-                    <div class="hero-avatar-wrapper">
-                        <img src="https://yt3.googleusercontent.com/b_aUblThh-aPH1_HvEjGXxvfPe9TjsLNJEbBisB2trJKNX6JJUz8hy0pzJcKmMgIFZkoIgug5g=s900-c-k-c0x00ffffff-no-rj" alt="pixeled">
-                        <div class="hero-role-badge">КРАСАВА</div>
-                    </div>
-                    <div class="hero-info">
-                        <h3 class="hero-name">PIXELED</h3>
-                        <p class="hero-title">ПРОСТО ЗАБАВНЫЙ</p>
-                        <p class="hero-desc">
-                            Задрот одной игры если понравилась вообще не вылезет с нее
-                            Ну вообще норм типочек
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="page finale">
-            <div class="finale-icon">🎁</div>
-            <h1 class="finale-title">КОНЕЦ? НЕТ! ЭТО ТОЛЬКО НАЧАЛО!</h1>
-            <div class="finale-text">
-                <p style="margin-bottom: 30px;">
-                    Это не просто подарок. Это <strong style="color: var(--neon-cyan);">НАША ИСТОРИЯ</strong>.
-                </p>
-                <p style="margin-bottom: 30px;">
-                    История четырёх человек, которые встретились в Discord, начали с конфликта, 
-                    но стали настоящей СЕМЬЁЙ.
-                </p>
-                <p style="margin-bottom: 30px;">
-                    Сотни часов в голосовом. Тысячи матчей. Миллионы шуток. 
-                    Каждый момент с вами <strong style="color: var(--neon-purple);">БЕСЦЕНЕН</strong>! 🎮
-                </p>
-                <p style="margin-bottom: 30px;">
-                    Денег может и нет, но есть что-то важнее — наша <strong style="color: var(--neon-pink);">ЛЕГЕНДА</strong>. 
-                    И она только начинается!
-                </p>
-                <p style="font-size: 2.5rem; color: var(--neon-cyan); margin: 50px 0 30px; text-shadow: 0 0 30px var(--neon-cyan);">
-                    С НОВЫМ 2026 ГОДОМ, БРАТЬЯ!
-                </p>
-                <p style="font-size: 2rem; color: var(--neon-purple); text-shadow: 0 0 30px var(--neon-purple);">
-                    ВМЕСТЕ МЫ НЕПОБЕДИМЫ! 🚀
-                </p>
-            </div>
-            <div class="finale-signature">— Ваш навсегда 💙</div>
-        </section>
-
+    <!-- Нижняя информация -->
+    <div class="footer-info">
+        <span>🌐 IP: 123.456.789.0:27015</span>
+        <span>📡 Ping: 45ms</span>
+        <span>⚡ Тикрейт: 66</span>
     </div>
 
     <script>
-        const snowflakesContainer = document.getElementById('snowflakes');
-        const snowflakeSymbols = ['❄', '❅', '❆', '✦', '✧', '⭐', '💫', '✨'];
-        
-        for (let i = 0; i < 50; i++) {
-            const snowflake = document.createElement('div');
-            snowflake.className = 'snowflake';
-            snowflake.textContent = snowflakeSymbols[Math.floor(Math.random() * snowflakeSymbols.length)];
-            snowflake.style.left = Math.random() * 100 + '%';
-            snowflake.style.animationDuration = (Math.random() * 15 + 10) + 's';
-            snowflake.style.animationDelay = Math.random() * 5 + 's';
-            snowflake.style.fontSize = (Math.random() * 0.8 + 0.8) + 'em';
-            snowflakesContainer.appendChild(snowflake);
+        // Симуляция загрузки
+        const files = [
+            'materials/models/player/soldier.vtf',
+            'models/weapons/w_ak47.mdl',
+            'sound/ambient/wind.wav',
+            'lua/autorun/darkrp.lua',
+            'materials/gui/hud_icons.png',
+            'models/props/door_metal.mdl',
+            'sound/voice/radio.mp3'
+        ];
+
+        let loaded = 0;
+        const total = 156;
+
+        function updateLoading() {
+            loaded++;
+            if (loaded > total) loaded = 0;
+            
+            document.getElementById('loaded').textContent = loaded;
+            document.getElementById('current-file').textContent = files[Math.floor(Math.random() * files.length)];
         }
 
-        // Основной функционал
-        const storyContainer = document.getElementById('storyContainer');
-        const pages = document.querySelectorAll('.page');
-        const progressBar = document.getElementById('progressBar');
-        const navDotsContainer = document.getElementById('navDots');
+        setInterval(updateLoading, 150);
 
-        // Создание навигации
-        pages.forEach((page, index) => {
-            const dot = document.createElement('div');
-            dot.className = 'nav-dot';
-            if (index === 0) dot.classList.add('active');
-            dot.addEventListener('click', () => {
-                page.scrollIntoView({ behavior: 'smooth' });
-            });
-            navDotsContainer.appendChild(dot);
-        });
-
-        const navDots = document.querySelectorAll('.nav-dot');
-
-        // Обновление прогресса
-        function updateProgress() {
-            const scrollTop = storyContainer.scrollTop;
-            const scrollHeight = storyContainer.scrollHeight - storyContainer.clientHeight;
-            const scrollPercentage = (scrollTop / scrollHeight) * 100;
-            progressBar.style.width = scrollPercentage + '%';
-
-            pages.forEach((page, index) => {
-                const rect = page.getBoundingClientRect();
-                const isVisible = rect.top < window.innerHeight / 2 && rect.bottom > window.innerHeight / 2;
-                
-                if (isVisible) {
-                    navDots.forEach(dot => dot.classList.remove('active'));
-                    navDots[index].classList.add('active');
-                    page.classList.add('visible');
-                }
-            });
+        // GMod функции
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+            // Можно обновить информацию о сервере
         }
 
-        // Observer для анимаций
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.2 });
+        function SetFilesTotal(total) {
+            document.getElementById('total').textContent = total;
+        }
 
-        pages.forEach(page => observer.observe(page));
+        function SetFilesNeeded(needed) {
+            document.getElementById('loaded').textContent = 
+                parseInt(document.getElementById('total').textContent) - needed;
+        }
 
-        storyContainer.addEventListener('scroll', updateProgress);
-
-        // Навигация клавиатурой
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-                e.preventDefault();
-                storyContainer.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
-            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-                e.preventDefault();
-                storyContainer.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
-            }
-        });
-
-        updateProgress();
+        function DownloadingFile(fileName) {
+            document.getElementById('current-file').textContent = fileName;
+        }
     </script>
-
 </body>
 </html>
